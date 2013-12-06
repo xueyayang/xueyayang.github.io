@@ -1,0 +1,215 @@
+﻿#LyX 2.0 created this file. For more info see http://www.lyx.org/<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<meta name="generator" content="http://www.nongnu.org/elyxer/"/>
+<meta name="create-date" content="2013-12-06"/>
+<link rel="stylesheet" href="http://elyxer.nongnu.org/lyx.css" type="text/css" media="all"/>
+<title>A20设定默认Launcher</title>
+</head>
+<body>
+<div id="globalWrapper">
+<h1 class="title">
+A20设定默认Launcher
+</h1>
+<h2 class="Section">
+<a class="toc" name="toc-Section-None.1">None.1</a> 问题
+</h2>
+<div class="Unindented">
+将ROM（A20-Homelet）的Launcher设置为“兔子视频”。即盒子启动后，直接进入兔子视频，而不是需要用户来选择：
+</div>
+<ul>
+<li>
+进入兔子视频还是其它Launcher？
+</li>
+<li>
+是Always呢还是JustOnce？
+</li>
+
+</ul>
+<h2 class="Section">
+<a class="toc" name="toc-Section-None.2">None.2</a> 手册怎么说
+</h2>
+<div class="Unindented">
+随源码的手册在：
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing">$A20_SRC/lichee/tools/tools_win/Documentations/sugar定制化说明.pdf
+</pre>
+</div>
+其中12.1节提到：
+</div>
+<div class="Indented">
+<img class="embedded" src="images/defaultLaucher.png" alt="figure images/defaultLaucher.png" style="width: 480px; max-width: 960px; height: 165px; max-height: 331px;"/>
+
+</div>
+<div class="Indented">
+需要注意的地方：
+</div>
+<ol>
+<li>
+sugar-ref001工程代号，此次修改的，应该是\strikeout off\uuline off\uwave offsugar-xbh_fjb.mk<span class="default">\uuline default\uwave default。(代号含义不详。）</span>
+</li>
+<li>
+com.softwinner.laucher及com.softwinner.laucher.Luacher，显然应该换成兔子视频的包名与类名
+</li>
+
+</ol>
+<h2 class="Section">
+<a class="toc" name="toc-Section-None.3">None.3</a> 如何得到第三方APK包的信息
+</h2>
+<div class="Unindented">
+Android SDK提供了一个叫aapt（Android Asset Package Tool）的工具，与adb在同一目录下（android-sdks/platform-tools）。
+</div>
+<h3 class="Subsection">
+<a class="toc" name="toc-Subsection-None.3.1">None.3.1</a> aapt的命令
+</h3>
+<div class="Unindented">
+<img class="embedded" src="images/badging.png" alt="figure images/badging.png" style="width: 404px; max-width: 808px; height: 168px; max-height: 337px;"/>
+
+</div>
+<div class="Indented">
+我们使用该工具的dump选项，输出badging信息。
+</div>
+<h3 class="Subsection">
+<a class="toc" name="toc-Subsection-None.3.2">None.3.2</a> 使用aapt得到包信息
+</h3>
+<div class="Unindented">
+<img class="embedded" src="images/pkg-info.png" alt="figure images/pkg-info.png" style="width: 475px; max-width: 1057px; height: 105px; max-height: 235px;"/>
+
+</div>
+<div class="Indented">
+这样，得到了需要的包名与类名信息：
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing">com.luxtone.tuzi3
+com.luxtone.tuzi3.activity.Main
+</pre>
+</div>
+
+</div>
+<h3 class="Subsection">
+<a class="toc" name="toc-Subsection-None.3.3">None.3.3</a> 其它方法
+</h3>
+<div class="Unindented">
+必须说明，这只是众多方法的一种。如果对Android开发较熟悉，可以用原生API编程来得到包信息；或者使用一些反编译工具，直接得到AndroidManifest.xml。
+</div>
+<h2 class="Section">
+<a class="toc" name="toc-Section-None.4">None.4</a> 不生效的处理
+</h2>
+<div class="Unindented">
+按照手册，到目录：
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing">$A20_SRC/android/device/softwinner/sugar-xbh_fjb
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+下找到文件sugar_xbh_fjb.mk，为变量\strikeout off\uuline off\uwave offPRODUCT_PROPERTY_OVERRIDES<span class="default">\uuline default\uwave default增添两个选项：</span>
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing">ro.sw.defaultlauncherpackage=com.luxtone.tuzi3 \ 
+ro.sw.defaultlauncherclass=com.luxtone.tuzi3.activity.Main \
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+重新编译、打包、烧录，启动盒子，发现却并不生效。
+</div>
+<h3 class="Subsection">
+<a class="toc" name="toc-Subsection-None.4.1">None.4.1</a> 修改代码
+</h3>
+<div class="Unindented">
+根据从网上找的资料，在目录：<div class="listing">
+<pre class="listing">$A20_SRC/android/frameworks/base/services/java/com/android/server/am
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+找到文件ActivityManagerService.java。
+</div>
+<div class="Indented">
+增加如下函数：
+</div>
+<div class="Indented">
+<img class="embedded" src="images/code_all.png" alt="figure images/code_all.png" style="width: 498px; max-width: 1246px; height: 660px; max-height: 1650px;"/>
+
+</div>
+<div class="Indented">
+并将此函数加入到startHomeActivityLocked()中：
+</div>
+<div class="Indented">
+<img class="embedded" src="images/code_call.png" alt="figure images/code_call.png" style="width: 472px; max-width: 944px; height: 150px; max-height: 300px;"/>
+
+</div>
+<div class="Indented">
+一点小细节，代码中的mFirstLaunch变量，也是需要改动者自己添加的。图中未予列出。
+</div>
+<h3 class="Subsection">
+<a class="toc" name="toc-Subsection-None.4.2">None.4.2</a> A20已经做的工作
+</h3>
+<div class="Unindented">
+事实上，上面提到的函数，A20的源码包中已经实现。但在startHomeActivityLocked()中，对该函数的调用却又被注释掉，原因不详。因此，如果只是针对A20的开发，只需要把这句代码放开即可。不需要做额外的工作。
+</div>
+<h2 class="Section">
+<a class="toc" name="toc-Section-None.5">None.5</a> 原理
+</h2>
+<div class="Unindented">
+这是一份HOW-TO的手册，关于原理不作说明。事实上也尚未研究。但从代码里看出，以下几方面应该进一步研究：
+</div>
+<ol>
+<li>
+sugar-xbh_fjb.mk中的PRODUCT_PROPERTY_OVERRIDES变量，值是如何流动的。
+</li>
+<li>
+一个Launchable的APK与非Launchable的APK的区别。
+</li>
+<li>
+IPackageManager类提供的API及在android framework中的作用。
+</li>
+<li>
+如果去掉mFirstLaunch的检验，是否可以永远去除切换到其它Launcher的可能。
+</li>
+
+</ol>
+<h2 class="Section">
+<a class="toc" name="toc-Section-None.6">None.6</a> 总结
+</h2>
+<div class="Unindented">
+简洁讲，针对A20，定制默认Launcher，Step-By-Step的操作应该是：
+</div>
+<ol>
+<li>
+为sugar-xbh_fjb.mk文件中的PRODUCT_PROPERTY_OVERRIDES变量添加两项<div class="listing">
+<pre class="listing">ro.sw.defaultlauncherpackage=com.luxtone.tuzi3 \ 
+ro.sw.defaultlauncherclass=com.luxtone.tuzi3.activity.Main \
+</pre>
+</div>
+其中，包名和类名是从兔子视频的APK包中获取的。
+</li>
+<li>
+到目录<div class="listing">
+<pre class="listing">$A20_SRC/android/frameworks/base/services/java/com/android/server/am
+</pre>
+</div>
+中，找到ActivityManagerService.java文件，并将2299行注释放开。
+</li>
+
+</ol>
+
+<hr class="footer"/>
+<div class="footer" id="generated-by">
+Document generated by <a href="http://elyxer.nongnu.org/">eLyXer 1.2.5 (2013-03-10)</a> on <span class="create-date">2013-12-06T11:23:26.636000</span>
+</div>
+</div>
+</body>
+</html>
