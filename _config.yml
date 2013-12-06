@@ -1,3 +1,4 @@
+baseurl: /xueyayang.github.io
 markdown: redcarpet
 pygments: true
-images_dir: xueyayang.github.io/images
+images_dir: images
