@@ -18,7 +18,7 @@ build.prop文件位于:
 该文件主要用于定义ROM的一些属性，如：
 
 * 设定ROM的Locale,如默认语言、地区等。
-* [设定ROM的默认Launcher](https://xueyayang.github.io/2013/12/04/A20%E8%AE%BE%E5%AE%9A%E9%BB%98%E8%AE%A4Launcher.html)
+* [设定ROM的默认Launcher][Default-Launcher]
 * 设定dalvkik虚拟机的堆大小(dalvik.vm.heapsize)。
 
 初步推测，凡是Android系统中用XX.YY.ZZ定义的属性，都可以在这里更改。
@@ -52,8 +52,8 @@ build.prop文件的生成？
 ------------------------
 
 ###从 PRODUCT\_PROPERTY\_OVERRIDES 变量谈起
-[如何替换默认Launcher](https://xueyayang.github.io/2013/12/04/A20%E8%AE%BE%E5%AE%9A%E9%BB%98%E8%AE%A4Launcher.html)一文里，我提到:
-在sugar\_xbh\_fjb.mk文件中，为PRODUCT\_PROPERTY\_OVERRIDES增加两项属性，即可替换默认Launcher。结合上面谈到的build.prop的作用，可以推测：为该变量增加的值，势必经过一些机制，而最终被写到了build.prop里。因为那里才是真正起作用的地方。这个机制是什么？变量值如何从.mk文件流动到了build.prop？正是本文试图说明的。
+[如何替换默认Launcher][Default-Launcher]一文里，我提到:
+在`sugar_xbh_fjb.mk`文件中，为`PRODUCT_PROPERTY_OVERRIDES`增加两项属性，即可替换默认Launcher。结合上面谈到的`build.prop`的作用，可以推测：为该变量增加的值，势必经过一些机制，而最终被写到了`build.prop`里。因为那里才是真正起作用的地方。这个机制是什么？变量值如何从.mk文件流动到了`build.prop`？正是本文试图说明的。
 
 ###谁包含了build.prop?
 全目录搜索:
@@ -63,7 +63,7 @@ grep -rn "build.prop" .
 发现包含文件名的，都是一些.mk文件。结合搜索来的信息，除去一些平台相关的mk文件，最后锁定：
 >$A20\_SRC/android/build/core/Makefile  
 
-##Makefile文件里写了什么？
+###Makefile文件里写了什么？
 打开上面提到的Makefile文件，有这么一段：
 {% highlight Makefile %}
 # -----------------------------------------------------------------
@@ -100,7 +100,7 @@ $(INSTALLED_DEFAULT_PROP_TARGET):
 从注释可以看出，该文件在生成我们的目标：build.prop前，先生成了一个叫default.prop的文件,
     只用了十几行。Makefile的语法本身古老晦涩，难以理解，加之生成build.prop的代码又很长，直接看难度很大。他山之石，可以攻玉。不如先研究如何生成default.prop文件,毕竟软柿子好捏。(事实证明，看懂了default.prop的生成过程，build.prop的生成代码不攻自破，大同小异。)
 
-##先看看default.prop的生成代码
+###先看看default.prop的生成代码
 代码我加了注释，分成两部分:先是变量定义与赋值，然后是真正的写入动作。
 我们关心写文件操作，逐行分析。
 
@@ -335,3 +335,5 @@ build.prop文件的生成过程：
     * 通过cat命令，从system.prop里读取
     * 通过echo命令，从变量PRODUCT\_PROPERTY\_OVERRIDES里读取
     * 通过脚本post\_process\_props.py写入
+
+[Default-Launcher]: https://xueyayang.github.io/2013/12/04/A20%E8%AE%BE%E5%AE%9A%E9%BB%98%E8%AE%A4Launcher.html
