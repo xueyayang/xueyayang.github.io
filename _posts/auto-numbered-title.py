@@ -9,7 +9,7 @@ l1 = 0;
 l2 = 0;
 l3 = 0;
 
-filename = 'A20.md'
+filename = 'default-language.md'
 
 _post = open(filename,'r');
 _all_lines = _post.readlines(); 
@@ -20,20 +20,20 @@ for i in range(0,len(_all_lines)):
 	if line.startswith(section1) and not line.startswith(section2):
 		l1 = l1 + 1
 		_number = str(l1)
-		_all_lines[i] = line[0:1] + _number + " " +  line[2:]
+		_all_lines[i] = line[0:2] + _number + " " +  line[2:]
 
 		l2 = 0
 		l3 = 0
 	if line.startswith(section2) and not line.startswith(section3):
 		l2 = l2 + 1
 		_number = str(l1 )+ "." + str(l2)
-		_all_lines[i] = line[0:2] + _number + " " +  line[3:]
+		_all_lines[i] = line[0:3] + _number + " " +  line[3:]
 
 		l3 = 0
 	if line.startswith(section3):
 		l3 = l3 + 1
 		_number = str(l1)+ "." + str(l2)+ "." + str(l3)
-		_all_lines[i] = line[0:3] + _number + " " +  line[4:]
+		_all_lines[i] = line[0:4] + _number + " " +  line[4:]
 
 
 _post = open(filename,'w+')
