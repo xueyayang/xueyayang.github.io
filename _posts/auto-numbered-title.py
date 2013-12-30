@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 import sys
 
-section1 = "##"
-section2 = "###"
-section3 = "####"
+section1 = "#"
+section2 = "##"
+section3 = "###"
 
 
 l1 = 0;
@@ -16,10 +16,12 @@ def IsHeader(line_0,line_1):
     result = 0
     if line_0.startswith(section1) and not line_0.startswith(section2):
         result = 1
-    elif line_1.startswith("-------"): 
+    elif line_1.startswith("==="): 
         result = 11
     elif line_0.startswith(section2) and not line_0.startswith(section3):
         result = 2
+    elif line_1.startswith("------"): 
+        result = 22
     elif line_0.startswith(section3):
         result = 3
     else:
@@ -36,7 +38,7 @@ def AutoNumber(filename):
     _all_lines = _post.readlines(); 
     _post.close();
 
-    for i in range(0,len(_all_lines)-1):
+    for i in range(6,len(_all_lines)-1):
         line = _all_lines[i]
         Head = IsHeader(_all_lines[i],_all_lines[i+1])
         if 0 == Head:
@@ -59,6 +61,12 @@ def AutoNumber(filename):
             l2 = l2 + 1
             _number = str(l1 )+ "." + str(l2)
             _all_lines[i] = line[0:3] + _number + " " +  line[3:]
+
+            l3 = 0
+        if 22 == Head:
+            l2 = l2 + 1
+            _number = str(l1 )+ "." + str(l2)
+            _all_lines[i] = _number + " " +  line[:]
 
             l3 = 0
         if 3 == Head:
