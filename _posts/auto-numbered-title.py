@@ -46,7 +46,7 @@ def AutoNumber(filename):
         if 1 == Head:
             l1 = l1 + 1
             _number = str(l1)
-            _all_lines[i] = line[0:2] + _number + " " +  line[2:]
+            _all_lines[i] = line[0:1] + _number + " " +  line[1:]
 
             l2 = 0
             l3 = 0
@@ -60,7 +60,7 @@ def AutoNumber(filename):
         if 2 == Head:
             l2 = l2 + 1
             _number = str(l1 )+ "." + str(l2)
-            _all_lines[i] = line[0:3] + _number + " " +  line[3:]
+            _all_lines[i] = line[0:2] + _number + " " +  line[2:]
 
             l3 = 0
         if 22 == Head:
@@ -72,8 +72,7 @@ def AutoNumber(filename):
         if 3 == Head:
             l3 = l3 + 1
             _number = str(l1)+ "." + str(l2)+ "." + str(l3)
-            _all_lines[i] = line[0:4] + _number + " " +  line[4:]
-
+            _all_lines[i] = line[0:3] + _number + " " +  line[3:]
 
     _post = open(filename,'w+')
     _post.write("".join(_all_lines))
