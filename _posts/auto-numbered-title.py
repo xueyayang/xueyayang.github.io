@@ -10,6 +10,14 @@ l1 = 0;
 l2 = 0;
 l3 = 0;
 
+def IsSourceCode(line_0,i):
+    is_source_code = 0
+    if line_0.startswith("{% highlight") or line_0.startswith("{% endhighlight"):
+        print "got one in line:",i
+        is_source_code = 1
+    
+    return is_source_code
+
 
 def IsHeader(line_0,line_1):
     global section1,section2,section3
@@ -20,7 +28,7 @@ def IsHeader(line_0,line_1):
         result = 11
     elif line_0.startswith(section2) and not line_0.startswith(section3):
         result = 2
-    elif line_1.startswith("------"): 
+    elif line_1.startswith("----"): 
         result = 22
     elif line_0.startswith(section3):
         result = 3
@@ -38,8 +46,19 @@ def AutoNumber(filename):
     _all_lines = _post.readlines(); 
     _post.close();
 
+    now_in_code_block = False
+
     for i in range(6,len(_all_lines)-1):
         line = _all_lines[i]
+
+        #is code block?
+        code_flag = IsSourceCode(_all_lines[i],i)
+        if code_flag == 1:
+            now_in_code_block = not now_in_code_block
+        if now_in_code_block == True:
+            print "continue in line:",i
+            continue
+
         Head = IsHeader(_all_lines[i],_all_lines[i+1])
         if 0 == Head:
             continue
