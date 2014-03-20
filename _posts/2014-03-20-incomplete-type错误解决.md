@@ -6,7 +6,7 @@ incomplete-type错误的解决
 ==========================
 
 
-问题
+1 问题
 ====
 包含某个头文件时，会报`incomplte-type`的错误。我这次是在使用`<linux/videodev2>`时，报这样的错误：
 
@@ -15,7 +15,7 @@ android-ndk-r8b/platforms/android-8/arch-arm/usr/include/linux/videodev2.h:270:1
 error: field 'timestamp' has incomplete type
 {% endhighlight%}
 
-解决
+2 解决
 ====
 打开`videodev2.h`文件，找到270行：
 {% highlight bash %}
@@ -29,13 +29,13 @@ struct timeval timestamp;
 经过google搜索，知道这个结构体定义在`<sys/time.h>`中。把这个头文件放到`<linux/videodev2>`
 之前，再编译，通过。
 
-补充说明
+3 补充说明
 ========
 - 问题是在我调整头文件顺序后出现的。推测其他头文件也有对`<sys/time.h>`的引用。
 - 有[网友认为][1]头文件互相包含也会导致这样的问题。暂时没想通。再遇到这样的问题再研究吧。
 
 
-总结
+4 总结
 ====
 - 知道的越多，碰到的问题也越多。——程序界的`人生识字忧患始`啊。
 - May the source be with you!
