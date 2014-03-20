@@ -2,7 +2,7 @@
 layout: default
 ---
 
-Ubuntu下开启SSH服务
+Ubuntu/Fedora下开启SSH服务
 ===================
 
 1 问题
@@ -18,15 +18,27 @@ LINUX下比较流行的ssh服务实现，应该是OpenSSL了吧。
 2.1 安装
 -----
 {% highlight bash%}
+#ubuntu
 sudo apt-get install openssh-server
+
+#fedora
+sudo yum install openssh-server
 {% endhighlight %}
 
 2.2 启动
 ----
 
 {% highlight bash%}
+#ubuntu
 sudo /etc/init.d/ssh restart
+
+#fedora
+systemctl enable sshd.service  #开机启动
+systemctl start sshd.service   #现在开启
 {% endhighlight %}
+
+可以看到，fedora的命令多了一条。Ubuntu作为桌面版，最流行，还是做了很多
+工作的。更安全还是更方便，不是太容易说出高低。
 
 2.3 测试
 ----
