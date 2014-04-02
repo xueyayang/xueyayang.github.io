@@ -39,6 +39,16 @@ layout: default
 - 如过AGLib.class
 - 有内部类`internal_xxx`，对应的`AGLib#internal_xxx.class`文件也要拷贝。
 
+### 2.2.1 可能错误
+{% highlight bash %}
+Error: cannot access android.app.Activity
+{% endhighlight %}
+
+这个是找不到`android.jar`。所以要在`classpath`选项后，指明android-sdk的路径。
+{% highlight bash%}
+javah -classpath .:/home/eric/Android_SDK_NDK/adt-bundle-linux/sdk/platforms/android-19/ -o jni4jhk.h com.zienon.util.AGLib
+{% endhighlight %}
+
 2.3 得到对应的JNI接口
 -----------------
 
