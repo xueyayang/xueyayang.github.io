@@ -2,7 +2,7 @@
 layout: default
 ---
 
-如何实现JNI接口
+如何实现JNI接口-Android程序JNI编程（一）
 ===============
 
 1 问题
@@ -32,6 +32,12 @@ layout: default
     mkdir -p com/zienon/util/
     cp AGLib.class com/zienon/util/
     javah -classpath . -o jni4jhk.h com.zienon.util.AGLib
+
+这里需要说明的是： 
+
+- AGLib.class 应该放到完整包名路径。如上面的，`com/zienon/util`。
+- 如过AGLib.class
+- 有内部类`internal_xxx`，对应的`AGLib#internal_xxx.class`文件也要拷贝。
 
 2.3 得到对应的JNI接口
 -----------------
