@@ -30,4 +30,4 @@ LOG_ERIC(ANDROID_LOG_INFO,TAG,"native_process_preview");
 ====
 - 逐渐补充中……
 
-[1]: 
+[1]: http://xueyayang.github.io/2014/01/15/%E7%94%9F%E6%88%90JNI%E6%8E%A5%E5%8F%A3-Android%E7%A8%8B%E5%BA%8FJNI%E7%BC%96%E7%A8%8B%EF%BC%88%E4%B8%80%EF%BC%89.html
