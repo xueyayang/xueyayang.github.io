@@ -66,5 +66,5 @@ Ubuntu-10.04.4 on AMD64`，我的机子是32位的。所以需要[手动编译LL
 [1]: https://github.com/Valloric/YouCompleteMe
 [2]: http://llvm.org/releases/download.html
 [3]: http://none 
-[4]: http://none 
+[4]: http://http://xueyayang.github.io/2014/04/08/Compile-Clang-From-Source.html
 
