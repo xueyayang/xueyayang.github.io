@@ -57,7 +57,32 @@ Ubuntu-10.04.4 on AMD64`，我的机子是32位的。所以需要[手动编译LL
 
 然后重复以上步骤，OK。
 
-2.6 总结
+2.6 手动编译LLVM+Clang的问题
+-----------------------------
+作者的CMake假设使用的是预先编译好的clang。如果手动编译，会报头文件错误：
+{% highlight bash %}
+In file included from /home/eric/.vim/bundle/YouCompleteMe/cpp/ycm/CandidateRepository.cpp:28:0:
+/home/eric/.vim/bundle/YouCompleteMe/cpp/ycm/ClangCompleter/CompletionData.h:23:27: fatal error: clang-c/Index.h: No such file or directory
+ #include <clang-c/Index.h>
+                           ^
+compilation terminated.
+{% endhighlight %}
+这是因为手动编译时，目录结构与官方发布的二进制包里的目录不一样。
+
+打开`CMakeLists.txt`，找到设置头文件与库的路径的地方，修改即可：
+{% highlight Makefile %}
+if ( PATH_TO_LLVM_ROOT )
+	set( CLANG_INCLUDES_DIR "${PATH_TO_LLVM_ROOT}/include" "${PATH_TO_LLVM_ROOT}/llvm/tools/clang/include/" )
+
+...
+
+else()
+  set( LIBCLANG_SEARCH_PATH "${PATH_TO_LLVM_ROOT}/Debug+Asserts/lib" )
+{% endhighlight %}
+
+查找时，`PATH_TO_LLVM_ROOT`是关键。重新编译。
+
+3 总结
 ========
 编译需要一台好机子。
 
