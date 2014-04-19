@@ -12,45 +12,55 @@ CMakeLists.txt简单例子
 
 2 例子
 ===================
-{% highlight sh%}
-#3 Version，这是CMake的要求 。方便用户检查自己的CMake够格不。
+{% highlight CMake%}
+# Version，这是CMake的要求 。方便用户检查自己的CMake够格不。
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
-#4 必要的变量。方便后面引用代码位置。
+# 必要的变量。方便后面引用代码位置。
 PROJECT(Native_Android_Framework)
 SET(PROJECT_ROOT_PATH "../")
 SET(EXECUTABLE_OUTPUT_PATH "${PROJECT_ROOT_PATH}/bin")
 SET(LIBRARY_OUTPUT_PATH "${PROJECT_ROOT_PATH}/lib")
 
-#5 include path 指定头文件
+# include path 指定头文件
 INCLUDE_DIRECTORIES("${PROJECT_ROOT_PATH}/inc/" "../../../ThirdPartyLibrary/CUnit/include")
 
-#6 Lib path 指定第三方库的路径
+# Lib path 指定第三方库的路径
 LINK_DIRECTORIES("../../../ThirdPartyLibrary/CUnit/lib" "../lib")
 
-###6.0.1 ###########################
-###6.0.2 用什么源码，加什么库，编译生成什么？
-#7 src
+##############################
+### 用什么源码，加什么库，编译生成什么？
+# src
 FILE(GLOB SOURCE_FILE "${PROJECT_ROOT_PATH}/jni/*.cpp")
-#8 target
+# target
 ADD_LIBRARY(native_android_framework SHARED ${SOURCE_FILE})
-#9 external lib
+# external lib
 TARGET_LINK_LIBRARIES(native_android_framework CUnit)
-###9.0.1 #############################
+################################
 
 
-###9.0.2 ###########################
-###9.0.3 用什么源码，加什么库，编译生成什么？
-#10 src
+##############################
+###用什么源码，加什么库，编译生成什么？
+#src
 FILE(GLOB SOURCE_TEST "${PROJECT_ROOT_PATH}/test/*.cpp")
-#11 target
+#target
 ADD_EXECUTABLE(test_main ${SOURCE_TEST})
-#12 external lib
+# external lib
 TARGET_LINK_LIBRARIES(test_main CUnit native_android_framework pthread)
-###12.0.1 #############################
+################################
 {% endhighlight %}
 
-3 总结
+3 补充
+====
+
+3.1 如何增加编译选项
+-----------------
+CMake定义了变量`CMAKE_CXX_FLAGS`
+{% highlight CMake %}
+SET(CMAKE_CXX_FLAGS "-Wall -Werror")
+{% endhighlight %}
+
+4 总结
 ======
 - 编译不在乎形式。
 - CMake真的很方便。
