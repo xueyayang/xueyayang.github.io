@@ -60,6 +60,12 @@ CMake定义了变量`CMAKE_CXX_FLAGS`
 SET(CMAKE_CXX_FLAGS "-Wall -Werror")
 {% endhighlight %}
 
+3.2 编译Debug版本
+------------------
+{% highlight bash %}
+cmake -DCMAKE_BUILD_TYPE=Debug -G "Unix Makefiles"
+{% endhighlight %}
+
 4 总结
 ======
 - 编译不在乎形式。
