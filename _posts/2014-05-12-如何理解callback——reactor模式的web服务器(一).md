@@ -1,6 +1,6 @@
 ---
 layout: default
-tag: English
+tag: design-pattern, c++
 ---
 
 如何理解callback--reactor模式的web服务器
