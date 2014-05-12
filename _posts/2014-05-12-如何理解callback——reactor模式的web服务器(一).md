@@ -60,7 +60,7 @@ callback很容易就解决了这个问题：
 
 所以，我定义如下函数指针：
 {% highlight cpp %}
-typedf int (*what_do_u_want_to_do_with_result)(RES_TYPE)
+typedef int (*what_do_u_want_to_do_with_result)(RES_TYPE)
 {% endhighlight %}
 
 需要使用该库的程序员，拿到API定义后，按照该定义实现一个函数，将其指针作为参数传进去即可。 这时候Server端就可以妥妥地说声：***Don't call me, I'll call back!!***。就是说，当有处理结果时，自己会调用`what_do_u_want_to_do_with_result`接口。
