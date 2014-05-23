@@ -1,0 +1,374 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass ctex-article
+\begin_preamble
+\let\oldquote\quote
+\renewcommand\quote{\small\oldquote}
+\let\oldquotation\quotation
+\renewcommand\quotation{\small\oldquotation}
+\usepackage{color}
+\definecolor{mygrey}{gray}{0.75}
+\lstset{
+language=bash,
+basicstyle=\footnotesize,
+backgroundcolor=\color{mygrey},
+frame=single,
+breaklines=true}
+\end_preamble
+\options nofonts
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman WenQuanYi Micro Hei
+\font_sans WenQuanYi Zen Hei
+\font_typewriter WenQuanYi Zen Hei Mono
+\font_default_family default
+\use_non_tex_fonts true
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format pdf4
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref true
+\pdf_bookmarks true
+\pdf_bookmarksnumbered true
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks true
+\pdf_pdfborder true
+\pdf_colorlinks false
+\pdf_backref false
+\pdf_pdfusetitle true
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle empty
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+使用pdf.js在jekyll中嵌入PDF文件
+\end_layout
+
+\begin_layout Section
+问题
+\end_layout
+
+\begin_layout Standard
+使用vim编写markdown文件，经jekyll处理，生成html，再发布到github page上。这样的流程使用了一段时间，感觉非常不错。
+\end_layout
+
+\begin_layout Standard
+现在遇到了问题，需要在文章中加入公式。这样的话：
+\end_layout
+
+\begin_layout Itemize
+vim书写起来就不方便，公式不好编辑
+\end_layout
+
+\begin_layout Itemize
+最后转换到html后，如何正确显示也是个问题。（嵌入图片开销又太大）
+\end_layout
+
+\begin_layout Standard
+所以想法就是用lyx来写博客，然后导出PDF。——如何在网页内显示PDF是个问题。
+\end_layout
+
+\begin_layout Section
+解决
+\end_layout
+
+\begin_layout Standard
+经过一番调查，决定使用pdf.js[
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://github.com/mozilla/pdf.js
+\end_layout
+
+\end_inset
+
+]这个解决方案。
+\end_layout
+
+\begin_layout Subsection
+下载&编译pdf.js
+\end_layout
+
+\begin_layout Subsubsection
+下载pdf.js源码:
+\end_layout
+
+\begin_layout Quote
+$ git clone git://github.com/mozilla/pdf.js.git pdfjs 
+\end_layout
+
+\begin_layout Quote
+$ cd pdfjs
+\end_layout
+
+\begin_layout Subsubsection
+安装node.js
+\end_layout
+
+\begin_layout Standard
+按照pdf.js主页上的说明，安装这个是为了编译pdf.js。到官网下载源码包[
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://nodejs.org/
+\end_layout
+
+\end_inset
+
+]。
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+tar -xzvf node-v0.10.28
+\end_layout
+
+\begin_layout Plain Layout
+
+cd node-v0.10.28
+\end_layout
+
+\begin_layout Plain Layout
+
+./configure
+\end_layout
+
+\begin_layout Plain Layout
+
+sudo make install
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+编译
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+node make generic
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+这时在pdfjs目录下生成
+\series bold
+generic/build
+\series default
+和
+\series bold
+generic/web
+\series default
+目录。前者包含pdf.js，是用来解析pdf的代码。后者是一个写好的例子。
+\end_layout
+
+\begin_layout Subsection
+布署pdf.js到jekyll目录下
+\end_layout
+
+\begin_layout Standard
+将编译后generic的下的两个目录拷贝到 jekyll的根目录下。
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+cd jekyll_root
+\end_layout
+
+\begin_layout Plain Layout
+
+mkdir js
+\end_layout
+
+\begin_layout Plain Layout
+
+cd js
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+cp -rv pdfjs/generic/build ./
+\end_layout
+
+\begin_layout Plain Layout
+
+cp -rv pdfjs/generic/web   ./
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+使用
+\end_layout
+
+\begin_layout Standard
+现在就可以使用pdf.js嵌入PDF文件了。
+\end_layout
+
+\begin_layout Subsubsection
+准备pdf文件
+\end_layout
+
+\begin_layout Standard
+为pdf形式的博客新建一个目录。
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+cd jekyll_root
+\end_layout
+
+\begin_layout Plain Layout
+
+mkdir pdf_posts
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+cp your_blog.pdf ./
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+新建md文件，链接pdf
+\end_layout
+
+\begin_layout Standard
+在.md文件中插入链接
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+[PDF格式的博客](/js/web/viewer.html?file=%2Fpdf_posts/your_blog.pdf)
+\end_layout
+
+\end_inset
+
+几点说明：
+\end_layout
+
+\begin_layout Itemize
+/js/web/viewer.html　是上面编译后，生成的使用pdf.js的模板网页
+\end_layout
+
+\begin_layout Itemize
+?file=　表示要向viewer.html输入参数，指定要显示的pdf文件
+\end_layout
+
+\begin_layout Itemize
+%2F是转义字符
+\end_layout
+
+\begin_layout Itemize
+pdf_posts/your_blog.pdf　是真正的博客文件
+\end_layout
+
+\begin_layout Section
+总结
+\end_layout
+
+\begin_layout Itemize
+js的模块使用还挺方便的。
+\end_layout
+
+\begin_layout Itemize
+与jekyll的接合还有改善的地方，如：
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+如何省掉用来加链接的.md文件，直接在index.html中连接指定的pdf文件？
+\end_layout
+
+\end_deeper
+\end_body
+\end_document
