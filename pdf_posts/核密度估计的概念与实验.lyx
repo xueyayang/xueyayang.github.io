@@ -1,0 +1,646 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass ctex-article
+\begin_preamble
+\let\oldquote\quote
+\renewcommand\quote{\small\oldquote}
+\let\oldquotation\quotation
+\renewcommand\quotation{\small\oldquotation}
+\usepackage{color}
+\definecolor{mygrey}{gray}{0.75}
+\lstset{%
+language=python,
+basicstyle=\footnotesize,
+backgroundcolor=\color{mygrey},
+frame=single,
+breaklines=true,
+}
+\end_preamble
+\options nofonts
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman WenQuanYi Micro Hei
+\font_sans WenQuanYi Zen Hei
+\font_typewriter WenQuanYi Zen Hei Mono
+\font_default_family default
+\use_non_tex_fonts true
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format pdf4
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref true
+\pdf_author "薛亚阳"
+\pdf_bookmarks true
+\pdf_bookmarksnumbered true
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks true
+\pdf_pdfborder true
+\pdf_colorlinks true
+\pdf_backref page
+\pdf_pdfusetitle true
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+核密度估计的概念与实验
+\end_layout
+
+\begin_layout Section
+问题
+\end_layout
+
+\begin_layout Standard
+本文讲述核密度估计的概念与原理，同时给出一个实验。文章是参考wikipedia上的定义
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+http://en.wikipedia.org/wiki/Kernel_density_estimation
+\end_layout
+
+\end_inset
+
+及python中的scipy包
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+http://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.gaussian_kde.html
+\end_layout
+
+\end_inset
+
+
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+https://github.com/scipy/scipy/blob/master/scipy/stats/kde.py
+\end_layout
+
+\end_inset
+
+的源码写就的。
+\end_layout
+
+\begin_layout Section
+解答
+\end_layout
+
+\begin_layout Subsection
+概念
+\end_layout
+
+\begin_layout Standard
+以函数估计打比方。现在手上有几个函数值
+\begin_inset Formula $(x_{i},y_{i})$
+\end_inset
+
+，即平面上的几个点。现在要从这个几个点，推测是从哪个函数中抽样的。如
+\begin_inset Formula $y=kx+b$
+\end_inset
+
+,
+\begin_inset Formula $y=x^{2}$
+\end_inset
+
+等。如果得到函数的表达式，就可以得到在指定区间，如
+\begin_inset Formula $[-5,5]$
+\end_inset
+
+内，任意位置处的函数值了。
+\end_layout
+
+\begin_layout Standard
+核密度估计是一样的概念。估计的是概率密度函数。
+\end_layout
+
+\begin_layout Standard
+从几个样本，估计其服从的分布，即求出其概率密度函数。有了概率密度函数以后，就可以得到在任意区间（值）处的概率了。
+\end_layout
+
+\begin_layout Standard
+所以，核密度是一个从具体(样本)到普遍（概率密度函数）的过程。然后再用普遍指导具体。
+\end_layout
+
+\begin_layout Subsection
+如何估计
+\end_layout
+
+\begin_layout Subsubsection
+放草帽求平均
+\end_layout
+
+\begin_layout Standard
+样本到底是从哪个分布中抽样的，我们不知道。不如假设每个样本都服从高斯分布，在该点处做一个高斯分布的图形。有Ｎ个样本，就能得到Ｎ个高斯分布。如wiki页面给出的图
+：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename 1000px-Comparison_of_1D_histogram_and_KDE.png
+	scale 30
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+其中，６条短黑线，即６个样本；６个红草帽，即样本所在点的高斯分布；一条蓝线，即密度估计的结果。有了这条蓝线，我们可以知道任意处的函数值。
+\end_layout
+
+\begin_layout Standard
+在[-5,10]的范围内，取任一点
+\begin_inset Formula $x_{0}$
+\end_inset
+
+为例，其所在处的值，认为等于Ｎ个高斯分布在此处的平均值。即，
+\begin_inset Formula 
+\begin{equation}
+F(x_{0})=\frac{g_{1}(x_{0})+g_{2}(x_{0})+g_{3}(x_{0})+g_{4}(x_{0})+g_{5}(x_{0})+g_{6}(x_{0})}{6}
+\end{equation}
+
+\end_inset
+
+更简洁（唬人）的写法是：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+F(x_{0})=\frac{1}{N}\sum_{i=0}^{N}G_{i}(x_{0})
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+如果说一个高斯分布是一个草帽的形状。上面这个过程就是一个放草帽的过程。
+\series bold
+在所有的样本点处放一个草帽，然后所有草帽相加求平均。
+\end_layout
+
+\begin_layout Subsubsection
+为什么假定服从高斯分布？
+\end_layout
+
+\begin_layout Standard
+选高斯分布的合理性在哪里？这跟中心极限定理
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+http://en.wikipedia.org/wiki/Central_limit_theorem
+\end_layout
+
+\end_inset
+
+有关系。即，任何分布，经过多次独立实验，最终都服从高斯分布。高斯分布的特殊性可见一斑。
+\end_layout
+
+\begin_layout Standard
+说穿了很简单，一群人中，（成绩／品德／身高／财富）特别好的特别坏的都是少数，大部分是普通人。这与我们的生活经验相符。不符合这个规律？那是因为你取的样本不够多。
+\end_layout
+
+\begin_layout Standard
+高斯分布又叫正态分布，就是正常状态的意思。
+\end_layout
+
+\begin_layout Standard
+高斯函数在这里就叫“核函数”。当然有别的核函数可选。但那都不是正常状态。
+\end_layout
+
+\begin_layout Subsubsection
+草帽的形状
+\end_layout
+
+\begin_layout Standard
+放草帽求平均就是核密度估计。那么，如何确定草帽的形状？草帽的形状与高峰期分布的参数有关，以１维为例：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+G(x)=\frac{1}{\sqrt{2\pi}*\sigma}e^{-\frac{(x-\mu)^{2}}{2*\sigma^{2}}}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\mu$
+\end_inset
+
+，
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+即期望，决定了草帽的中轴在哪里。
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\sigma^{2}$
+\end_inset
+
+，即方差，决定了草帽的宽度(与高度)
+\end_layout
+
+\begin_layout Standard
+在核密度估计的过程中，即放草帽的过程中
+\series bold
+：
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+期望，是各个样本点的位置，
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+方差，是所有样本点的方差。
+\end_layout
+
+\begin_layout Subsubsection
+引入带宽的概念
+\end_layout
+
+\begin_layout Standard
+既然是估计，肯定就会有校正。比如，估计的概率密度函数新鲜出炉了。结果发现用它求出的值总是偏大，怎么办？那就缩放一下吧：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+G(x)=\frac{1}{\sqrt{2\pi}*\sigma*h}e^{-\frac{(x-\mu)^{2}}{2*\sigma^{2}*h^{2}}}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+合并一下的话，可以看到，本质是将
+\begin_inset Formula $\sigma$
+\end_inset
+
+变成了
+\begin_inset Formula $\sigma*h$
+\end_inset
+
+。这个缩放因子
+\begin_inset Formula $h$
+\end_inset
+
+，通常叫做
+\series bold
+带宽
+\series default
+。
+\end_layout
+
+\begin_layout Standard
+如何计算带宽？那就是靠经验了。各家有各家的方法，就是
+\begin_inset Quotes erd
+\end_inset
+
+rule of thumb
+\begin_inset Quotes erd
+\end_inset
+
+。一般跟样本的数量及样本的维度有关系。
+\end_layout
+
+\begin_layout Subsection
+实验
+\end_layout
+
+\begin_layout Standard
+真正的应用场景，不知道分布是概率密度函数是什么样的。做实验就不一样了：
+\end_layout
+
+\begin_layout Itemize
+从标准高斯分布
+\begin_inset Formula $\text{(\mu=0,\sigma=1)}$
+\end_inset
+
+里抽取100个点,区间为[-5,5]。
+\end_layout
+
+\begin_layout Itemize
+按照上面的方法，估计出一个概率密度函数f(x)
+\end_layout
+
+\begin_layout Itemize
+依据密度函数，画出在[-5,-5]的分布
+\end_layout
+
+\begin_layout Standard
+观察画出的分布，与标准高斯分布的曲线越接近，说明估计的越准确。
+\end_layout
+
+\begin_layout Subsubsection
+准备数据
+\end_layout
+
+\begin_layout Standard
+从标准高斯分布里，生成50个随机数。
+\end_layout
+
+\begin_layout Subsubsection
+求方差
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+mean = sum(dataset)/N
+\end_layout
+
+\begin_layout Plain Layout
+
+variance = (dataset - mean)*(dataset - mean)/(N-1)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+求带宽
+\end_layout
+
+\begin_layout Standard
+这里选用的是scipy库的默认的scotts_factor。其计算与两个因素有关：
+\end_layout
+
+\begin_layout Itemize
+样本的个数，
+\begin_inset Formula $N$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+样本的维度，
+\begin_inset Formula $d$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+在这个实验里，显然，
+\begin_inset Formula $N=50$
+\end_inset
+
+,
+\begin_inset Formula $d=1$
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+h=N^{-\frac{1}{d+4}}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+计算过程
+\end_layout
+
+\begin_layout Standard
+以[-5,5]中的一点
+\begin_inset Formula $x_{pos}$
+\end_inset
+
+的值为例，计算该处的函数值：
+\begin_inset Formula 
+\begin{equation}
+F(x_{0})={\color{green}\frac{1}{N*h}}\sum_{i=0}^{N}e^{-\frac{(x_{pos}-x_{i})^{2}}{2*\sigma^{2}*{\color{red}h^{2}}}}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $x_{i}$
+\end_inset
+
+为所有的样本点，可以看到:
+\end_layout
+
+\begin_layout Standard
+当
+\begin_inset Formula $i=0$
+\end_inset
+
+时，表示以
+\begin_inset Formula $x_{０}$
+\end_inset
+
+为中轴的高斯分布，在
+\begin_inset Formula $x=x_{pos}$
+\end_inset
+
+时，取得的值
+\end_layout
+
+\begin_layout Standard
+当
+\begin_inset Formula $i=1$
+\end_inset
+
+时，表示以
+\begin_inset Formula $x_{１}$
+\end_inset
+
+为中轴的高斯分布，在
+\begin_inset Formula $x=x_{pos}$
+\end_inset
+
+时，取得的值
+\end_layout
+
+\begin_layout Standard
+当
+\begin_inset Formula $i=2$
+\end_inset
+
+时，表示以
+\begin_inset Formula $x_{2}$
+\end_inset
+
+为中轴的高斯分布，在
+\begin_inset Formula $x=x_{pos}$
+\end_inset
+
+处，取得的值
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $……$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+对所有的
+\begin_inset Formula $x_{i}$
+\end_inset
+
+，放置一项草帽，再将草帽在
+\begin_inset Formula $x_{pos}$
+\end_inset
+
+处的值累加，求平均。就认为是
+\begin_inset Formula $x_{pos}$
+\end_inset
+
+的值。
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $x_{pos}$
+\end_inset
+
+属于[-5,5]的任意点，所以求整个分布，就是将这个公式计算M次，M是[-5,-5]被分成了多少个间隔。间隔越小，画出的曲线越平滑。
+\end_layout
+
+\begin_layout Subsubsection
+实验结果
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename 1d_kde_result.png
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+可以看到，本文的结果与scipy lib的结果是一致的，重合。因此准确性没问题。
+\end_layout
+
+\begin_layout Subsubsection
+源码
+\end_layout
+
+\begin_layout Standard
+完整的源码在：
+\begin_inset CommandInset href
+LatexCommand href
+target "https://github.com/xueyayang/v4l2_demo/blob/master/kernel-density-estimation/gaussian_1d_kde.py"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+复杂度分析
+\end_layout
+
+\begin_layout Standard
+样本数N，估计位置数M。O(n)=M*N
+\end_layout
+
+\begin_layout Section
+总结
+\end_layout
+
+\begin_layout Itemize
+计算方差很重要。
+\end_layout
+
+\begin_layout Itemize
+计算带宽很重要。
+\end_layout
+
+\begin_layout Itemize
+熟悉高斯公式很重要。
+\end_layout
+
+\begin_layout Itemize
+囿于个人所学，文章重应用不重数学原理推导。
+\end_layout
+
+\end_body
+\end_document
