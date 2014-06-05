@@ -5,9 +5,16 @@ title: Xueyayang
 
 <div id="home">
   <h1>Blog Posts</h1>
+
+  <ul class="posts">
+    {% for post in site.data.pdf_posts %}
+	<li><span>{{ post.date }}</span> &raquo; <a href="{{ post.url }}">{{ post.name }}</a></li>
+    {% endfor %}
+  </ul>
+
   <ul class="posts">
     {% for post in site.posts %}
-      <li><span>{{ post.date | date_to_string }}</span> &raquo; <a href="{{ post.url }}">{{ post.title }}</a></li>
+	<li><span>{{ post.date | date_to_string }}</span> &raquo; <a href="{{ post.url }}">{{ post.title }}</a></li>
     {% endfor %}
   </ul>
 </div>
