@@ -1,0 +1,618 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass ctex-article
+\begin_preamble
+\let\oldquote\quote
+\renewcommand\quote{\small\oldquote}
+\let\oldquotation\quotation
+\renewcommand\quotation{\small\oldquotation}
+\usepackage{color}
+\definecolor{mygrey}{gray}{0.75}
+\lstset{%
+language=bash,
+basicstyle=\footnotesize,
+backgroundcolor=\color{mygrey},
+frame=single,
+breaklines=true,
+}
+\end_preamble
+\options nofonts
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman WenQuanYi Micro Hei
+\font_sans WenQuanYi Zen Hei
+\font_typewriter WenQuanYi Zen Hei Mono
+\font_default_family default
+\use_non_tex_fonts true
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format pdf4
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref true
+\pdf_bookmarks true
+\pdf_bookmarksnumbered true
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks true
+\pdf_pdfborder true
+\pdf_colorlinks true
+\pdf_backref page
+\pdf_pdfusetitle true
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+2维核密度估计实验
+\end_layout
+
+\begin_layout Section
+问题
+\end_layout
+
+\begin_layout Standard
+讲解２维的核密度估计实验，以及需要注意的地方。文章基于scipy包的文档
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+http://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.gaussian_kde.html
+\end_layout
+
+\end_inset
+
+上的例子写就。
+\end_layout
+
+\begin_layout Section
+解答
+\end_layout
+
+\begin_layout Subsection
+准备数据
+\end_layout
+
+\begin_layout Standard
+分别从２个一维高斯分布中抽样，简单运算，分别当作(x,y)。这里用的是np.random.norm().
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+r1 = np.random.normal(size=1000)
+\end_layout
+
+\begin_layout Plain Layout
+
+r2 = np.random.normal(scal=0.5,size=n)
+\end_layout
+
+\begin_layout Plain Layout
+
+m1 = r1 - r2
+\end_layout
+
+\begin_layout Plain Layout
+
+m2 = r1 + r2
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+#样本值
+\end_layout
+
+\begin_layout Plain Layout
+
+samples = np.vstack([m1,m2])
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+xmin = m1.min()     
+\end_layout
+
+\begin_layout Plain Layout
+
+xmax = m1.max()     
+\end_layout
+
+\begin_layout Plain Layout
+
+ymin = m2.min()     
+\end_layout
+
+\begin_layout Plain Layout
+
+ymax = m2.max()
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+X,Y = np.mgrid[xmin:xmax:100j,ymin:ymax:100j] 
+\end_layout
+
+\begin_layout Plain Layout
+
+#坐标值
+\end_layout
+
+\begin_layout Plain Layout
+
+postions = np.vstack([X.ravel(),Y.ravel()])
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+理解postions
+\end_layout
+
+\begin_layout Standard
+postions宽为(xmax - xmin)，高为(ymax - ymin)的方形区域。在实际图像中，从左往右，排列顺(以５为例)序为：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\begin{array}{ccccc}
+x_{0} & x_{1} & x_{2} & x_{3} & x_{4}\\
+x_{0} & x_{1} & x_{2} & x_{3} & x_{4}\\
+x_{0} & x_{1} & x_{2} & x_{3} & x_{4}\\
+x_{0} & x_{1} & x_{2} & x_{3} & x_{4}\\
+x_{0} & x_{1} & x_{2} & x_{3} & x_{4}
+\end{array}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+但经np.mgrid生成的Ｘ为：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\begin{array}{ccccc}
+x_{0} & x_{0} & x_{0} & x_{0} & x_{0}\\
+x_{1} & x_{1} & x_{1} & x_{1} & x_{1}\\
+x_{2} & x_{2} & x_{2} & x_{2} & x_{2}\\
+x_{3} & x_{3} & x_{3} & x_{3} & x_{3}\\
+x_{4} & x_{4} & x_{4} & x_{4} & x_{4}
+\end{array}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+经X.ravel()后，排列顺序为：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\begin{array}{cccccc}
+x_{0} & x_{0} & \cdots & x_{1} & x_{1} & \cdots\end{array}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+注意(1)与(2)的旋转关系。这是为什么最终代码里，显示结果时，要调用np.rot90()函数。
+\end_layout
+
+\begin_layout Subsection
+求方差
+\end_layout
+
+\begin_layout Standard
+这是二维样本与一维样本区别较大的地方。一维空间的方差，在二维空间里，变成了
+\series bold
+协方差矩阵
+\series default
+。如何理解协方差矩阵？这个“协”就是相关性的意思。Ｎ个样本点可以表示成(2,N)的形式。第一行全是X,第二行全是Ｙ。
+\begin_inset Formula 
+\begin{equation}
+X=\begin{array}{ccccccccc}
+x_{0} & x_{1} & x_{2} & x_{3} & \ldots & x_{996} & x_{997} & x_{998} & x_{999}\\
+y_{0} & y_{1} & y_{2} & y_{3} & \ldots & y_{996} & y_{997} & y_{998} & y_{999}
+\end{array}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+对于X，方差是sigma_x
+\end_layout
+
+\begin_layout Standard
+对于Y，方差是sigma_y
+\end_layout
+
+\begin_layout Standard
+但现在(X,Y)，不能简单割裂开来，计算Ｘ的方差时，要考虑Ｙ的影响；计算Ｙ的方差时，要考虑Ｘ的影响。所以：
+\begin_inset Formula 
+\begin{equation}
+\begin{array}{cc}
+\sigma_{xx} & \sigma_{xy}\\
+\sigma_{yx} & \sigma_{yy}
+\end{array}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+如何计算，才能得到这个协方差呢？其实很简单，先将样本点表示成X：
+\begin_inset Formula 
+\begin{equation}
+\hat{X}=\begin{array}{ccccc}
+x_{0}-\bar{x}, & x_{1}-\bar{x}, & \cdots & x_{998}-\bar{x}, & x_{999}-\bar{x}\\
+y_{0}-\bar{y}, & y_{1}-\bar{y}, & \cdots & y_{998}-\bar{y}, & y_{999}-\bar{y}
+\end{array}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+上面是(2,1000)的向量，减去其期望(
+\begin_inset Formula $\bar{x}$
+\end_inset
+
+,
+\begin_inset Formula $\bar{y}$
+\end_inset
+
+) 后得到的(2,1000)的向量。上面一行用x_i表示，下面一行用y_i表示
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray}
+\sigma_{xx} & = & \frac{\sum_{i=0}^{N}(x_{i}-\bar{x})*(x_{i}-\bar{x})}{N-1}\\
+\sigma_{xy} & = & \frac{\sum_{i=0}^{N}(x_{i}-\bar{x})*(y_{i}-\bar{y})}{N-1}\\
+\sigma_{yx} & = & \frac{\sum_{i=0}^{N}(y_{i}-\bar{y})*(x_{i}-\bar{x})}{N-1}\\
+\sigma_{yy} & = & \frac{\sum_{i=0}^{N}(y_{i}-\bar{y})*(y_{i}-\bar{y})}{N-1}
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+公式有点唬人，转换成代码非常简洁，尤其是python中：
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+# calcuate the covariance matrix
+\end_layout
+
+\begin_layout Plain Layout
+
+def calculate_variance_2d(dataset):
+\end_layout
+
+\begin_layout Plain Layout
+
+    M,N = dataset.shape
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+    row_1 = dataset[0]
+\end_layout
+
+\begin_layout Plain Layout
+
+    row_2 = dataset[1]
+\end_layout
+
+\begin_layout Plain Layout
+
+    mean_1 = sum(row_1)/N
+\end_layout
+
+\begin_layout Plain Layout
+
+    mean_2 = sum(row_2)/N
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+    mean_matrix = dataset - [[mean_1],[mean_2]]
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+    covariance_matrix = zeros((2,2), dtype=np.float)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+    covariance_matrix[0,0] = sum((mean_matrix[0])*(mean_matrix[0]))/(N-1)
+\end_layout
+
+\begin_layout Plain Layout
+
+    covariance_matrix[0,1] = sum((mean_matrix[0])*(mean_matrix[1]))/(N-1)
+\end_layout
+
+\begin_layout Plain Layout
+
+    covariance_matrix[1,0] = sum((mean_matrix[1])*(mean_matrix[0]))/(N-1)
+\end_layout
+
+\begin_layout Plain Layout
+
+    covariance_matrix[1,1] = sum((mean_matrix[1])*(mean_matrix[1]))/(N-1)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+    return covariance_matrix
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+计算带宽
+\end_layout
+
+\begin_layout Standard
+这个与１维的完全一样,仍然选用scotts_factor。
+\begin_inset Formula 
+\begin{equation}
+h=N^{-\frac{1}{d+4}}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+二维高斯公式
+\end_layout
+
+\begin_layout Standard
+上面该准备的变量准备好，现在给出基于这些变量的高斯公式。
+\begin_inset Formula 
+\begin{eqnarray}
+G(x,y) & = & \frac{1}{\sqrt{2\pi*det(A)}*h}*e^{-{\color{red}{\color{black}\frac{1}{2}*\sum}_{{\color{black}i=0}}^{{\color{black}N}}\frac{(Xpos-X_{i})*{\color{green}(X_{pos}-X_{i})}}{A^{-1}*h^{2}}}}\\
+A & = & \left[\begin{array}{cc}
+\sigma_{xx} & \sigma_{xy}\\
+\sigma_{yx} & \sigma_{yy}
+\end{array}\right]
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+其中A是协方差矩阵，det(A)表示求行列式的值。X是二维向量,公式（１），即横向排列的一个个样本点。h是带宽。A^-1表示矩阵的逆。
+\end_layout
+
+\begin_layout Subsubsection
+对应的python代码及解释
+\end_layout
+
+\begin_layout Standard
+对应的代码很简单：
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+...
+\end_layout
+
+\begin_layout Plain Layout
+
+diff = values[:,i,newaxis] - positions
+\end_layout
+
+\begin_layout Plain Layout
+
+tdiff = dot(tdiff_factor,diff)
+\end_layout
+
+\begin_layout Plain Layout
+
+#NOTE: the meaning of sum the diff*tdiff
+\end_layout
+
+\begin_layout Plain Layout
+
+energy = sum(diff*tdiff,axis=0) / 2.0
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+代码与公式的对应关系：
+\end_layout
+
+\begin_layout Standard
+diff: 公式中绿色的部分
+\end_layout
+
+\begin_layout Standard
+tdiff:公式中红色的部分
+\end_layout
+
+\begin_layout Standard
+tdiff_factor: 
+\begin_inset Formula $A^{-1}*h^{2}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+其中，dot（）运算代表矩阵乘法中的两个矩阵相乘，符全矩阵乘法规律，(2,2)*(2,1000)，相乘后，是(2,1000)
+\end_layout
+
+\begin_layout Standard
+diff*tdiff，是向量对应点相乘。其中diff为(2,1000)，tdiff(2,1000)，相乘后，还是(2,1000)
+\end_layout
+
+\begin_layout Subsection
+代码及实验结果
+\end_layout
+
+\begin_layout Standard
+完整的源码在：
+\begin_inset CommandInset href
+LatexCommand href
+target "https://github.com/xueyayang/v4l2_demo/blob/master/kernel-density-estimation/gaussian_2d_kde.py"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+实验结果如下：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename 2d_kde_result.png
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+总结
+\end_layout
+
+\begin_layout Itemize
+理解协方差很重要
+\end_layout
+
+\begin_layout Itemize
+理解一维到二维时，高斯公式是相乘的，但指数是相加的。
+\end_layout
+
+\begin_layout Itemize
+生成随机样本时，要展开。
+\end_layout
+
+\begin_layout Itemize
+最终的结果要旋转。
+\end_layout
+
+\end_body
+\end_document
