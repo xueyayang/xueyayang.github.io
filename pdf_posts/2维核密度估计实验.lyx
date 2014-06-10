@@ -115,8 +115,20 @@ http://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.gaussian_kde.htm
 准备数据
 \end_layout
 
-\begin_layout Standard
-分别从２个一维高斯分布中抽样，简单运算，分别当作(x,y)。这里用的是np.random.norm().
+\begin_layout Itemize
+样本值：分别从２个一维高斯分布中抽样，经过加减运算，再当作二维空间的
+\begin_inset Formula $X$
+\end_inset
+
+与
+\begin_inset Formula $Y$
+\end_inset
+
+。
+\end_layout
+
+\begin_layout Itemize
+位置点：从二维平面一个方形区域等间隔采点，作为核密度估计的位置点。由mgrid函数完成。
 \begin_inset listings
 inline false
 status open
@@ -208,7 +220,21 @@ postions = np.vstack([X.ravel(),Y.ravel()])
 \end_layout
 
 \begin_layout Standard
-postions宽为(xmax - xmin)，高为(ymax - ymin)的方形区域。在实际图像中，从左往右，排列顺(以５为例)序为：
+postions宽为(xmax - xmin)，高为(ymax - ymin)的方形区域。在实际图像中看起来是这样的
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename 2d_kde_samples.png
+	scale 35
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+写成矩阵形式是
 \end_layout
 
 \begin_layout Standard
@@ -229,7 +255,7 @@ x_{0} & x_{1} & x_{2} & x_{3} & x_{4}
 \end_layout
 
 \begin_layout Standard
-但经np.mgrid生成的Ｘ为：
+但经np.mgrid生成的Ｘ却为：
 \end_layout
 
 \begin_layout Standard
@@ -316,7 +342,7 @@ y_{0} & y_{1} & y_{2} & y_{3} & \ldots & y_{996} & y_{997} & y_{998} & y_{999}
 \end_layout
 
 \begin_layout Standard
-如何计算，才能得到这个协方差呢？其实很简单，先将样本点表示成X：
+如何计算，才能得到这个协方差呢？就要将Ｘ与Ｙ当成上下两行，分别减去其期望：
 \begin_inset Formula 
 \begin{equation}
 \hat{X}=\begin{array}{ccccc}
@@ -339,7 +365,15 @@ y_{0}-\bar{y}, & y_{1}-\bar{y}, & \cdots & y_{998}-\bar{y}, & y_{999}-\bar{y}
 \begin_inset Formula $\bar{y}$
 \end_inset
 
-) 后得到的(2,1000)的向量。上面一行用x_i表示，下面一行用y_i表示
+) 后得到的(2,1000)的向量。上面一行用
+\begin_inset Formula $x_{i}$
+\end_inset
+
+表示，下面一行用
+\begin_inset Formula $y_{i}$
+\end_inset
+
+表示
 \end_layout
 
 \begin_layout Standard
@@ -357,104 +391,27 @@ y_{0}-\bar{y}, & y_{1}-\bar{y}, & \cdots & y_{998}-\bar{y}, & y_{999}-\bar{y}
 \end_layout
 
 \begin_layout Standard
-公式有点唬人，转换成代码非常简洁，尤其是python中：
-\begin_inset listings
-inline false
-status open
-
-\begin_layout Plain Layout
-
-# calcuate the covariance matrix
-\end_layout
-
-\begin_layout Plain Layout
-
-def calculate_variance_2d(dataset):
-\end_layout
-
-\begin_layout Plain Layout
-
-    M,N = dataset.shape
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-    row_1 = dataset[0]
-\end_layout
-
-\begin_layout Plain Layout
-
-    row_2 = dataset[1]
-\end_layout
-
-\begin_layout Plain Layout
-
-    mean_1 = sum(row_1)/N
-\end_layout
-
-\begin_layout Plain Layout
-
-    mean_2 = sum(row_2)/N
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-    mean_matrix = dataset - [[mean_1],[mean_2]]
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-    covariance_matrix = zeros((2,2), dtype=np.float)
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-    covariance_matrix[0,0] = sum((mean_matrix[0])*(mean_matrix[0]))/(N-1)
-\end_layout
-
-\begin_layout Plain Layout
-
-    covariance_matrix[0,1] = sum((mean_matrix[0])*(mean_matrix[1]))/(N-1)
-\end_layout
-
-\begin_layout Plain Layout
-
-    covariance_matrix[1,0] = sum((mean_matrix[1])*(mean_matrix[0]))/(N-1)
-\end_layout
-
-\begin_layout Plain Layout
-
-    covariance_matrix[1,1] = sum((mean_matrix[1])*(mean_matrix[1]))/(N-1)
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-    return covariance_matrix
-\end_layout
-
+注意
+\begin_inset Formula $\sigma_{xx}$
 \end_inset
 
+和
+\begin_inset Formula $\sigma_{yy}$
+\end_inset
 
+，二者就是常规的计算方差过程，自身与自身相乘。
+\begin_inset Formula $\sigma_{xy}$
+\end_inset
+
+与
+\begin_inset Formula $\sigma_{yx}$
+\end_inset
+
+则是自身与另一向量中对应点相乘，——这样才能体现相关性嘛。
+\end_layout
+
+\begin_layout Standard
+公式有点唬人，转换成代码非常简洁，尤其是python中。源码一看便知。
 \end_layout
 
 \begin_layout Subsection
@@ -494,23 +451,30 @@ A & = & \left[\begin{array}{cc}
 \end_layout
 
 \begin_layout Standard
-其中A是协方差矩阵，det(A)表示求行列式的值。X是二维向量,公式（１），即横向排列的一个个样本点。h是带宽。A^-1表示矩阵的逆。
+其中A是协方差矩阵，det(A)表示求行列式的值。X是二维的，如公式
+\begin_inset Formula $(1)$
+\end_inset
+
+所示。
+\begin_inset Formula $h$
+\end_inset
+
+是带宽。
+\begin_inset Formula $A^{-1}$
+\end_inset
+
+表示矩阵的逆。
 \end_layout
 
 \begin_layout Subsubsection
-对应的python代码及解释
+对应代码的解释
 \end_layout
 
 \begin_layout Standard
-对应的代码很简单：
+这一计算过程由以下代码完成：
 \begin_inset listings
 inline false
 status open
-
-\begin_layout Plain Layout
-
-...
-\end_layout
 
 \begin_layout Plain Layout
 
@@ -541,28 +505,48 @@ energy = sum(diff*tdiff,axis=0) / 2.0
 代码与公式的对应关系：
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
 diff: 公式中绿色的部分
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
 tdiff:公式中红色的部分
 \end_layout
 
-\begin_layout Standard
-tdiff_factor: 
+\begin_layout Itemize
+tdiff_factor:对应公式中的 
 \begin_inset Formula $A^{-1}*h^{2}$
 \end_inset
 
 
 \end_layout
 
-\begin_layout Standard
-其中，dot（）运算代表矩阵乘法中的两个矩阵相乘，符全矩阵乘法规律，(2,2)*(2,1000)，相乘后，是(2,1000)
+\begin_layout Itemize
+dot()函数：矩阵乘法，符合矩阵乘法规律，(2,2)*(2,1000)
+\begin_inset Formula $\rightarrow$
+\end_inset
+
+(2,1000)
 \end_layout
 
-\begin_layout Standard
-diff*tdiff，是向量对应点相乘。其中diff为(2,1000)，tdiff(2,1000)，相乘后，还是(2,1000)
+\begin_layout Itemize
+diff*tdiff，向量对应点相乘。Ｘ行乘以Ｘ行，Ｙ行乘以Ｙ行。(2,1000)*(2,1000)
+\begin_inset Formula $\rightarrow$
+\end_inset
+
+(2,1000)
+\end_layout
+
+\begin_layout Itemize
+sum()函数：上下两列相加，２维高斯是由1维高斯
+\series bold
+相乘
+\series default
+而来，在指数上表现为X与Y的
+\series bold
+相加
+\series default
+。
 \end_layout
 
 \begin_layout Subsection
@@ -594,6 +578,11 @@ target "https://github.com/xueyayang/v4l2_demo/blob/master/kernel-density-estima
 
 \end_layout
 
+\begin_layout Standard
+注意其中的no rotaion。如果对结果不旋转的话，画出的图像与样本点的分布是垂直的。原因是因为生成的结果，顺序与输入的samples的顺序一致。而输入的sa
+mples(公式２)与位置点(公式１)的顺序，存在着旋转关系。
+\end_layout
+
 \begin_layout Section
 总结
 \end_layout
@@ -604,10 +593,6 @@ target "https://github.com/xueyayang/v4l2_demo/blob/master/kernel-density-estima
 
 \begin_layout Itemize
 理解一维到二维时，高斯公式是相乘的，但指数是相加的。
-\end_layout
-
-\begin_layout Itemize
-生成随机样本时，要展开。
 \end_layout
 
 \begin_layout Itemize
