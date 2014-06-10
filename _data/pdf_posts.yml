@@ -5,6 +5,11 @@
     "name":"核密度估计的概念与实验.pdf"
   },
   {
+    "url":"/pdf_posts/2维核密度估计实验.pdf",
+    "date":"10 June 2014",
+    "name":"2维核密度估计实验.pdf"
+  },
+  {
     "url":"/pdf_posts/使用pdf.js在jekyll中嵌入PDF文件.pdf",
     "date":"23 May 2014",
     "name":"使用pdf.js在jekyll中嵌入PDF文件.pdf"
