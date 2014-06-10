@@ -1,0 +1,327 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass article
+\begin_preamble
+\let\oldquote\quote
+\renewcommand\quote{\small\oldquote}
+\let\oldquotation\quotation
+\renewcommand\quotation{\small\oldquotation}
+\usepackage{minted}
+\usepackage{color}
+\definecolor{mygrey}{gray}{0.88}
+\definecolor{keywords}{RGB}{255,0,90}
+\definecolor{comments}{RGB}{0,0,113}
+\definecolor{red}{RGB}{160,0,0}
+\definecolor{green}{RGB}{0,150,0}
+\lstset{float}
+\lstset{%
+language=Tex,
+captionpos=b,
+basicstyle=\footnotesize,
+keywordstyle=\color{keywords},
+commentstyle=\color{comments},
+stringstyle=\color{red},
+%backgroundcolor=\color{mygrey},
+%identifierstyle=\color{green},
+frame=lines,
+numbers=left,  
+%framerule=1pt,
+%tabsize=2,  
+breaklines=true,
+extendedchars=false,
+float
+}
+
+\lstnewenvironment{code}[1][]%
+  {\minipage{\linewidth} 
+   \lstset{basicstyle=\ttfamily\footnotesize,frame=single,#1}}
+  {\endminipage}
+
+
+\usepackage{sectsty}
+\allsectionsfont{\raggedright}
+\end_preamble
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman WenQuanYi Micro Hei
+\font_sans WenQuanYi Micro Hei
+\font_typewriter WenQuanYi Micro Hei
+\font_default_family default
+\use_non_tex_fonts true
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format pdf4
+\output_sync 0
+\bibtex_command default
+\index_command default
+\float_placement !tbph
+\paperfontsize default
+\spacing single
+\use_hyperref true
+\pdf_bookmarks true
+\pdf_bookmarksnumbered true
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks true
+\pdf_pdfborder true
+\pdf_colorlinks true
+\pdf_backref page
+\pdf_pdfusetitle true
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Lyx中用listing包来排版代码
+\end_layout
+
+\begin_layout Section
+问题
+\end_layout
+
+\begin_layout Standard
+Lyx中，如何排版出漂亮的代码。包括：高亮、行号、背景色等常见特性。
+\end_layout
+
+\begin_layout Section
+解答
+\end_layout
+
+\begin_layout Subsection
+为什么不是minted？
+\end_layout
+
+\begin_layout Standard
+最终选用了listing包，原因有二：
+\end_layout
+
+\begin_layout Itemize
+更新持续
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+http://en.wikibooks.org/wiki/LaTeX/Source_Code_Listings#Customizing_captions
+\end_layout
+
+\end_inset
+
+。而另一个号称“top-notch”的minted包，好像已经好几年没有更新了。
+\end_layout
+
+\begin_layout Itemize
+支持的关键字更多。
+\end_layout
+
+\begin_layout Subsection
+设置
+\end_layout
+
+\begin_layout Standard
+在Document->Settings->Latex Preamble中插入如下命令：
+\begin_inset VSpace 12bp
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+lstset{%
+\end_layout
+
+\begin_layout Plain Layout
+
+language=Python,％换成所需的语言
+\end_layout
+
+\begin_layout Plain Layout
+
+captionpos=b,
+\end_layout
+
+\begin_layout Plain Layout
+
+basicstyle=
+\backslash
+footnotesize,
+\end_layout
+
+\begin_layout Plain Layout
+
+keywordstyle=
+\backslash
+color{keywords},
+\end_layout
+
+\begin_layout Plain Layout
+
+commentstyle=
+\backslash
+color{comments},
+\end_layout
+
+\begin_layout Plain Layout
+
+stringstyle=
+\backslash
+color{red},
+\end_layout
+
+\begin_layout Plain Layout
+
+%backgroundcolor=
+\backslash
+color{mygrey},
+\end_layout
+
+\begin_layout Plain Layout
+
+%identifierstyle=
+\backslash
+color{green},
+\end_layout
+
+\begin_layout Plain Layout
+
+frame=lines,#1,
+\end_layout
+
+\begin_layout Plain Layout
+
+numbers=left,  
+\end_layout
+
+\begin_layout Plain Layout
+
+%framerule=1pt,
+\end_layout
+
+\begin_layout Plain Layout
+
+tabsize=2,  
+\end_layout
+
+\begin_layout Plain Layout
+
+breaklines=true,
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+usepackage{sectsty}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+allsectionsfont{
+\backslash
+raggedright}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+如何使用
+\end_layout
+
+\begin_layout Standard
+Insert->Programming List。然后插入需要的代码即可。
+\end_layout
+
+\begin_layout Subsection
+控制行间距
+\end_layout
+
+\begin_layout Standard
+默认的列表框离与上行的行间距较近。可以强行插入空行：Insert->Formatting->Vertical Space，然后选
+\begin_inset Quotes erd
+\end_inset
+
+Custom->12bp
+\begin_inset Quotes erd
+\end_inset
+
+。这个距离我比较喜欢。
+\end_layout
+
+\begin_layout Subsection
+其它
+\end_layout
+
+\begin_layout Standard
+习惯了标题靠左，上面代码的最后两行就是使标题靠左的。
+\end_layout
+
+\begin_layout Section
+总结
+\end_layout
+
+\begin_layout Standard
+latex几乎是无所不能的啊。
+\end_layout
+
+\end_body
+\end_document
