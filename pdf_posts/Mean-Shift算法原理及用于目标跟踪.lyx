@@ -1,0 +1,652 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass ctex-article
+\begin_preamble
+\let\oldquote\quote
+\renewcommand\quote{\small\oldquote}
+\let\oldquotation\quotation
+\renewcommand\quotation{\small\oldquotation}
+\usepackage{minted}
+\usepackage{color}
+\definecolor{mygrey}{gray}{0.88}
+\definecolor{keywords}{RGB}{255,0,90}
+\definecolor{comments}{RGB}{0,0,113}
+\definecolor{red}{RGB}{160,0,0}
+\definecolor{green}{RGB}{0,150,0}
+
+
+\usepackage{sectsty}
+\allsectionsfont{\raggedright}
+\end_preamble
+\options nofonts
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman WenQuanYi Micro Hei
+\font_sans WenQuanYi Micro Hei
+\font_typewriter WenQuanYi Micro Hei
+\font_default_family default
+\use_non_tex_fonts true
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format pdf4
+\output_sync 0
+\bibtex_command default
+\index_command default
+\float_placement bp
+\paperfontsize default
+\spacing single
+\use_hyperref true
+\pdf_bookmarks true
+\pdf_bookmarksnumbered true
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks true
+\pdf_pdfborder true
+\pdf_colorlinks true
+\pdf_backref page
+\pdf_pdfusetitle true
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Mean-Shift算法的原理及用于跟踪的实验
+\end_layout
+
+\begin_layout Section
+问题
+\end_layout
+
+\begin_layout Standard
+本文讲解Mean-Shift算法的原理，及在目标跟踪中的应用。主要参考《Learning OpenCV》一书
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+位于第十章“运动与跟踪”第二节
+\end_layout
+
+\end_inset
+
+中的讲解及OpenCV的源码。
+\end_layout
+
+\begin_layout Section
+解答
+\end_layout
+
+\begin_layout Subsection
+Mean-Shift的本质
+\end_layout
+
+\begin_layout Standard
+Mean-Shift是个算法，本质是个方法（工具）。用来求局部极值的方法（工具）。是众多数值分析方法中的一个。
+\end_layout
+
+\begin_layout Subsection
+为什么要求局部极值?　
+\end_layout
+
+\begin_layout Standard
+从目标跟踪这个问题的定义开始：
+\begin_inset VSpace bigskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename mean_shift_1.png
+	scale 30
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename mean_shift_2.png
+	scale 30
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+追踪场景中胶水瓶的盖子
+\end_layout
+
+\begin_layout Itemize
+将图像表示成概率图，每个像素点都是一个概率值，代表该点是目标的可能性的大小
+\end_layout
+
+\begin_layout Itemize
+初始选定目标所在位置，中心位于矩形的对角线中心（几何中心）
+\end_layout
+
+\begin_layout Standard
+问题：下一帧中，中心的位置？
+\end_layout
+
+\begin_layout Standard
+如果能找到概率最大(可能性最大)的位置，就认为目标是所在位置
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+注意：此处不是单个最大值点，否则直接遍历即可。谁是最大值，一个点说了不算，得所有点投票。
+\end_layout
+
+\end_inset
+
+。
+\end_layout
+
+\begin_layout Subsection
+颜色概率模型
+\end_layout
+
+\begin_layout Standard
+上面说的颜色概率模型，生成过程如下：
+\end_layout
+
+\begin_layout Enumerate
+生成目标的直方图。
+\end_layout
+
+\begin_layout Enumerate
+根据直方图各区间内像素的多少，为该区间分配一个概率(
+\begin_inset Formula $p_{i}=$
+\end_inset
+
+
+\begin_inset Formula $\frac{\text{当前区间像素数}}{\text{所有像素数}}$
+\end_inset
+
+)。
+\end_layout
+
+\begin_layout Enumerate
+遍历原图，根据像素点所在区间，为其分配概率。这一过程称为back-projection。
+\end_layout
+
+\begin_layout Enumerate
+新建图像，存储每一点的概率，得到
+\series bold
+概率图
+\series default
+。
+\end_layout
+
+\begin_layout Standard
+具体可参考opencv文档＋代码。
+\shape italic
+--calcBackProject
+\shape default
+接口。
+\end_layout
+
+\begin_layout Subsection
+直观的理解
+\end_layout
+
+\begin_layout Standard
+确定下一个中心的位置，实际是个投票的过程。扫描窗口中的每个点都要发言。故事是这样的：每个点都认为，下一个中心应该向自己靠拢，自己才是世界的中心。听谁的？——谁的
+钱多(权值大)听谁的。
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+权值是什么？就是该点的概率。
+\end_layout
+
+\begin_layout Standard
+如果你是红色，你很可能是目标，所以，中心向你那儿移动多点；
+\end_layout
+
+\begin_layout Standard
+如果你是紫色，你有可能是目标，所以，中心向你那儿移动少点；
+\end_layout
+
+\begin_layout Standard
+如果你是黑色，你不可能是目标，所以，中心不会向你那儿移动。
+\end_layout
+
+\begin_layout Subsection
+直观上加点数学，质心
+\end_layout
+
+\begin_layout Standard
+上述的过程，实际就是求质心的过程。求中心的公式，就是求质心的公式：
+\begin_inset Formula 
+\begin{equation}
+\bar{x}=\sum x_{i}*\frac{P{}_{i}}{\sum P_{i}}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\bar{y}=\sum y_{i}*\frac{P{}_{i}}{\sum P_{i}}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+以
+\begin_inset Formula $x$
+\end_inset
+
+为例，其中：
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $x_{i}$
+\end_inset
+
+表示每一点的横坐标
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $P_{i}$
+\end_inset
+
+表示该点是目标的概率
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\sum P_{i}$
+\end_inset
+
+是所有点概率之和，显然，
+\begin_inset Formula $P_{i}/\sum P_{i}$
+\end_inset
+
+表示该点在所有点中的影响力
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $x_{i}*(P_{i}/\sum P_{i})$
+\end_inset
+
+，即表示往自己(
+\begin_inset Formula $x_{i}$
+\end_inset
+
+)偏移的多少
+\end_layout
+
+\begin_layout Standard
+最终的结果，
+\begin_inset Formula $\bar{x}$
+\end_inset
+
+，显然受
+\begin_inset Formula $P_{i}$
+\end_inset
+
+值较大的点影响较大。多么民主的过程！
+\end_layout
+
+\begin_layout Subsection
+直观上再加点数学，梯度
+\end_layout
+
+\begin_layout Standard
+不知道怎么开口，也不知道怎么跟你说，但是求极值就是绕不开梯度（导数）。梯度的定义非常有意思：
+\end_layout
+
+\begin_layout Itemize
+方向(direction)：朝着函数值变化最快的方向
+\end_layout
+
+\begin_layout Itemize
+大小(magnitude)：等于该点切线的斜率
+\end_layout
+
+\begin_layout Standard
+参考维基百科的示意图
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+http://en.wikipedia.org/wiki/Gradient
+\end_layout
+
+\end_inset
+
+：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename 450px-Gradient2.svg.png
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+梯度的方向就是颜色加深最快的方向；梯度的大小等于
+\begin_inset Formula $\Delta y/\Delta x$
+\end_inset
+
+，即该点竖直方向的变化比上水平方向的变化，也就是切线斜率。
+\end_layout
+
+\begin_layout Standard
+参考维基百科举的例子：
+\end_layout
+
+\begin_layout Quotation
+Consider a room in which the temperature is given by a scalar field, T,
+ so at each point (x,y,z) the temperature is T(x,y,z).
+ (We will assume that the temperature does not change over time.) At each
+ point in the room, the gradient of T at that point will show the direction
+ the temperature rises most quickly.
+ The magnitude of the gradient will determine how fast the temperature rises
+ in that direction.
+\end_layout
+
+\begin_layout Quotation
+以房间中的温度为例，是个标量场，用T来表示，任一点的温度是T(x,y,z)。方便分析，假设房间里各点温度保持不变。某一点的梯度方向是什么？就是该点处，温度上升最
+快的
+\series bold
+方向
+\series default
+。那什么是梯度的Magtitude?就是在该方向上温度变化的有多快。
+\end_layout
+
+\begin_layout Standard
+从梯度的角度考虑确定了：
+\end_layout
+
+\begin_layout Itemize
+往哪里走？——梯度的方向。
+\end_layout
+
+\begin_layout Itemize
+走多远？——梯度的大小。
+\end_layout
+
+\begin_layout Standard
+两个问题，就能找到极值点了。
+\end_layout
+
+\begin_layout Standard
+那如何求梯度呢?求导。对谁求导呢？对概率密度函数求导
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+图像被表示成了概率图，所以梯度的方向指向概率上升最快的方向。此时，中心就是样本分布最集中的地方，如二维高斯分布的中心。这个中心，在跟踪中，就认为是目标。
+\end_layout
+
+\end_inset
+
+。那怎么得到概率密度函数呢？——核密度估计。
+\end_layout
+
+\begin_layout Subsection
+如何求概率密度函数？
+\end_layout
+
+\begin_layout Standard
+核密度估计是从有限样本，得到这些样本所服从的概率分布——通过估计概率密度函数来实现
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+http://xueyayang.github.io/pdf_posts/核密度估计的概念与实验.pdf
+\end_layout
+
+\begin_layout Plain Layout
+http://xueyayang.github.io/pdf_posts/2维核密度估计实验.pdf
+\end_layout
+
+\end_inset
+
+。
+\end_layout
+
+\begin_layout Subsection
+公式推导
+\end_layout
+
+\begin_layout Standard
+核密度估计在
+\begin_inset Formula $x_{p}$
+\end_inset
+
+点的值的估计(以高斯核为例)：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+P(x_{p})=\frac{1}{N}*\frac{1}{\sqrt{2\pi\sigma^{2}}}*\sum_{i=1}^{N}e^{-\frac{(x_{p}-x_{i})^{2}}{2*\sigma^{2}*h^{2}}}*P(x_{i})
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+注意其中的
+\begin_inset Formula $P(x_{i})$
+\end_inset
+
+，在脚注４的实验里是没有的。它表示样本点的概率。其意义是明显的：样本点的来自目标的可能性越大，对估计结果的影响越大；如果样本点来自目标的概率为０（噪声），则不该
+对估计结果产生影响。
+\end_layout
+
+\begin_layout Standard
+脚注４中的实验之所以没有这一项，是因为所有的样本点都是有效的。
+\end_layout
+
+\begin_layout Standard
+抽象一些，核用
+\begin_inset Formula $k(\cdot)$
+\end_inset
+
+来代替，写成更一般的形式：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+P(x_{p})=ck(\parallel\frac{(x_{p}-x_{i})^{2}}{h}\parallel)
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+求导：
+\begin_inset Formula 
+\begin{equation}
+\nabla P(x_{p})=c^{\prime}*{\color{red}\sum k_{i}^{\prime}(\parallel\frac{(x_{p}-x_{i})^{2}}{h}\parallel)}*{\color{blue}\sum2*(x_{p}-x_{i})}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+如果令:
+\begin_inset Formula 
+\begin{equation}
+g(x)=-k^{\prime}(x)
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+代入上式得：
+\begin_inset Formula 
+\begin{eqnarray*}
+\nabla P(x_{p}) & = & c^{\prime}*\left\{ \sum g_{i}(\parallel\frac{(x_{p}-x_{i})^{2}}{h}\parallel)*{\color{blue}\sum x_{i}}-\sum g_{i}(\parallel\frac{(x_{p}-x_{i})^{2}}{h}\parallel)*{\color{blue}\sum x_{p}}\right\} \\
+ & = & c^{\prime}*\sum g_{i}(\parallel\frac{(x_{p}-x_{i})^{2}}{h}\parallel)*\left[\frac{{\color{red}x_{i}}*g_{i}(\parallel\frac{(x_{p}-x_{i})^{2}}{h}\parallel)}{g_{i}(\parallel\frac{(x_{p}-x_{i})^{2}}{h}\parallel)}-{\color{red}x_{p}}\right]
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+令上式等于０，解出:
+\begin_inset Formula 
+\begin{equation}
+{\color{red}x_{p}^{\prime}}=\frac{{\color{red}x_{i}}*g_{i}(\parallel\frac{(x_{p}-x_{i})^{2}}{h}\parallel)}{g_{i}(\parallel\frac{(x_{p}-x_{i})^{2}}{h}\parallel)}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $x_{p}^{\prime}$
+\end_inset
+
+就是新的中心位置。
+\end_layout
+
+\begin_layout Standard
+可以看到，如果
+\begin_inset Formula $g_{i}(\cdot)$
+\end_inset
+
+的值始终为１（方波情况），上式就蜕化成最简单（符合直觉）的形式：求质心。
+\end_layout
+
+\begin_layout Subsubsection
+核密度估计的物理意义：
+\end_layout
+
+\begin_layout Standard
+观察公式发现，相对最简单的“质心”形式，选用高斯核，本质是将样本与原中心的
+\series bold
+距离
+\series default
+这一因素考虑进去。
+\end_layout
+
+\begin_layout Standard
+对于高斯核来讲，这一因素表现为，距离越远，样本的发言权越小。
+\end_layout
+
+\begin_layout Standard
+对于矩形核来讲，这一因素表现为，距离远近对发言权的大小无影响。
+\end_layout
+
+\begin_layout Standard
+回到实际情况，目标的颜色分布一般来讲，更接近矩形分布（颜色均匀）。并不随着距离而衰减，所以，对于胶水瓶盖子，高斯模型并无效果提升。
+\end_layout
+
+\begin_layout Subsection
+源码
+\end_layout
+
+\begin_layout Standard
+所有源码在:
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset href
+LatexCommand href
+target "https://github.com/xueyayang/v4l2_demo/tree/master/mean-shift"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+总结
+\end_layout
+
+\begin_layout Subsection
+核的选择
+\end_layout
+
+\begin_layout Standard
+对于最简单的颜色模型，选用矩形核，即，求质心的形式足够了。
+\end_layout
+
+\begin_layout Subsection
+时间开销
+\end_layout
+
+\begin_layout Standard
+选用高斯核，一次shift的时间大约是矩形核的30倍左右。开销集中在
+\end_layout
+
+\begin_layout Itemize
+高斯公式的计算
+\end_layout
+
+\begin_layout Itemize
+带宽h的计算
+\end_layout
+
+\begin_layout Itemize
+方差的计算
+\end_layout
+
+\end_body
+\end_document

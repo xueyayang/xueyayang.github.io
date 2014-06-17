@@ -5,7 +5,8 @@ import os
 import glob
 import json
 
-pdf_post_dirs = '../pdf_posts/*.pdf'
+#pdf_post_dirs = '../pdf_posts/*.pdf'
+pdf_post_dirs = './*.pdf'
 
 
 #print glob.glob(pdf_post_dirs)
