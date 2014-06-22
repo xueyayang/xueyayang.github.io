@@ -43,7 +43,7 @@ meld $2 $5
 可见git传出的参数很多，但是之用到了`$2`与`$5`。
 
 别忘了:
-> chmod +x git_diff_meld.sh
+> chmod +x git\_diff\_meld.sh
 
 3 总结
 ====
