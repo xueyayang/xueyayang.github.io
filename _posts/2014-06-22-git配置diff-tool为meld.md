@@ -49,5 +49,8 @@ meld $2 $5
 ====
 
 - 琐碎的东西，记录下来是为了新环境中节省时间。
-- 随后记录配置svn的diff-tool为meld
+- svn对应的配置在[这里][1]。
+
+
+[1]: http://xueyayang.github.io/2014/06/23/svn%E9%85%8D%E7%BD%AEdiff-tool%E4%B8%BAmeld.html
 
