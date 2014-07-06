@@ -1,0 +1,460 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_math auto
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Harris角点的原理与实验
+\end_layout
+
+\begin_layout Section
+问题
+\end_layout
+
+\begin_layout Standard
+Harris角点是什么？如何寻找图像中的角点？本文基于《Learning OpenCV》第十章“Corner Finding”一节及OpenCV源代码写就。
+\end_layout
+
+\begin_layout Section
+解答
+\end_layout
+
+\begin_layout Subsection
+角点是什么？
+\end_layout
+
+\begin_layout Standard
+直观上，就是图像中的“角”，如正方形的四角。相对方形内部的任意点来说，在下一帧中更容易确定其位置。
+\end_layout
+
+\begin_layout Subsection
+Harris角点的定义？
+\end_layout
+
+\begin_layout Standard
+Harris角点是将就是角点用数学定义描述:在两个方向的导数都是极大值。仍然用正方形色块来描述：
+\end_layout
+
+\begin_layout Itemize
+内部点：在X方向导数为0；Y方向导数为0；
+\end_layout
+
+\begin_layout Itemize
+边缘点：
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+水平边缘：X方向导数为0；Y方向导数为极大值
+\end_layout
+
+\begin_layout Itemize
+垂直边缘：X方向导数为极大值；Y方向导数为0
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+角点：X方向导数为极大值；Y方向导数为极大值。
+\end_layout
+
+\begin_layout Standard
+引入Hessian Matrix：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+H(p)=\left[\begin{array}[t]{cc}
+\frac{\partial^{2}I}{\partial x^{2}} & \frac{\partial^{2}I}{\partial x\partial y}\\
+\frac{\partial^{2}I}{\partial y\partial x} & \frac{\partial^{2}I}{\partial y^{2}}
+\end{array}\right]
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+这个矩阵由
+\series bold
+p点处
+\series default
+的
+\series bold
+二阶导数
+\series default
+、
+\series bold
+偏导
+\series default
+组成。
+\end_layout
+
+\begin_layout Standard
+Harris角点的定义是，如果一点处的Hessian Matrix满足以下条件：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+Det(H)-k*Trace(H)<\epsilon
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+就认为是角点。
+\end_layout
+
+\begin_layout Standard
+其中：
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $Det(H)$
+\end_inset
+
+是对矩阵H求行列式的值
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $Trace(H)$
+\end_inset
+
+是矩阵H的“迹”
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Formula $k$
+\end_inset
+
+是根据经验指定的一个系数。OpenCV中选的是0.04
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\epsilon$
+\end_inset
+
+是根据经验指定的一个阈值。OpenCV做法是：用所有差值中的最大值，乘上一个quality level。
+\end_layout
+
+\end_deeper
+\begin_layout Subsection
+原理到代码的对应
+\end_layout
+
+\begin_layout Standard
+这个是做图像处理比较挠头的一部分，明明原理懂了，到写代码却一筹莫展。因此这里对此多写一些。
+\end_layout
+
+\begin_layout Subsubsection
+导数
+\end_layout
+
+\begin_layout Standard
+以X方向的导数为例，设I(x,y)为点(x,y)处的灰度值，那么该点处的导数就是：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial I}{\partial x}=I(x+1,y)-I(x-1,y)
+\end{equation}
+
+\end_inset
+
+即右侧点减去左侧点的灰度值。
+\end_layout
+
+\begin_layout Standard
+对应的，Y方向的导数为：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial I}{\partial x}=I(x,y+1)-I(x,y-1)
+\end{equation}
+
+\end_inset
+
+即下方点减去上方点的灰度值。
+\end_layout
+
+\begin_layout Standard
+对啦，就是用Sobel算子对图像做卷积。最简单的，就是：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\left[-1,0,1\right]
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\left[\begin{array}[t]{c}
+-1\\
+0\\
+1
+\end{array}\right]
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+得到两个方向的Sobel图，
+\begin_inset Formula $Dx$
+\end_inset
+
+,
+\begin_inset Formula $Dy$
+\end_inset
+
+。
+\end_layout
+
+\begin_layout Subsubsection
+二阶导数与偏导
+\end_layout
+
+\begin_layout Standard
+参考OpenCV的代码，二阶导数由一阶导数相乘而来。非常简单。（却是不太明白其中的数学原理。）上面求出了X方向的一阶导数，记为
+\begin_inset Formula $dx$
+\end_inset
+
+；Y方向的一阶导数记为
+\begin_inset Formula $dy$
+\end_inset
+
+，那么：
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial^{2}I}{\partial x^{2}}=dx*dx
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial^{2}I}{\partial x\partial y}=\frac{\partial^{2}I}{\partial y\partial x}=dx*dy
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial^{2}I}{\partial y^{2}}=dy*dy
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+非常简单，是不是？
+\end_layout
+
+\begin_layout Subsubsection
+行列式与矩阵的迹
+\end_layout
+
+\begin_layout Standard
+以矩阵
+\begin_inset Formula 
+\begin{equation}
+\begin{array}[t]{cc}
+a & b\\
+b & c
+\end{array}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+为例：
+\end_layout
+
+\begin_layout Itemize
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+\begin_inset Formula $Det(H)=a*c-b*b$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $Trace(H)=(a+c)*(a+c)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+实践中的优化
+\end_layout
+
+\begin_layout Standard
+理论上，理论与实践是严格一致的；实践上，实践与理论总是有差距。上面的分析是以一点处的导数组成Hessian Matrix；实际上，对任一点，会计算其8邻域所有点
+的导数和，然后再生成Hessian Matrix来计算角点。
+\end_layout
+
+\begin_layout Standard
+在代码里，即对
+\begin_inset Formula $Dx$
+\end_inset
+
+,
+\begin_inset Formula $Dy$
+\end_inset
+
+分别用算子：
+\begin_inset Formula 
+\begin{equation}
+\left[\begin{array}[t]{ccc}
+1 & 1 & 1\\
+1 & 1 & 1\\
+1 & 1 & 1
+\end{array}\right]
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+求卷积。
+\end_layout
+
+\begin_layout Subsubsection
+代码与实验
+\end_layout
+
+\begin_layout Standard
+源代码在
+\begin_inset CommandInset href
+LatexCommand href
+target "https://github.com/xueyayang/v4l2_demo/tree/master/harris_corner/src"
+
+\end_inset
+
+。可以与OpenCV的实现达到同样的效果。
+\end_layout
+
+\begin_layout Section
+结论
+\end_layout
+
+\begin_layout Itemize
+矩阵、导数的理论很重要。也挺有意思。
+\end_layout
+
+\begin_layout Itemize
+从理论到代码的实现好像关心的人很少。经常找到的资料略过不提。还是我太菜了？
+\end_layout
+
+\end_body
+\end_document
