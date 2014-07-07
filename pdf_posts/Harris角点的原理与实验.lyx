@@ -182,7 +182,7 @@ Harris角点的定义是，如果一点处的Hessian Matrix满足以下条件：
 \begin_layout Standard
 \begin_inset Formula 
 \begin{equation}
-Det(H)-k*Trace(H)<\epsilon
+Det(H)-k*Trace(H)*Trace(H)<\epsilon
 \end{equation}
 
 \end_inset
@@ -401,7 +401,7 @@ b & c
 \end_layout
 
 \begin_layout Itemize
-\begin_inset Formula $Trace(H)=(a+c)*(a+c)$
+\begin_inset Formula $Trace(H)=(a+c)$
 \end_inset
 
 
