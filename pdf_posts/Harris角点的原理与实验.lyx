@@ -1,51 +1,70 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
 \begin_document
 \begin_header
-\textclass article
+\textclass ctex-article
+\begin_preamble
+\let\oldquote\quote
+\renewcommand\quote{\small\oldquote}
+\let\oldquotation\quotation
+\renewcommand\quotation{\small\oldquotation}
+\usepackage{minted}
+\usepackage{color}
+\definecolor{mygrey}{gray}{0.88}
+\definecolor{keywords}{RGB}{255,0,90}
+\definecolor{comments}{RGB}{0,0,113}
+\definecolor{red}{RGB}{160,0,0}
+\definecolor{green}{RGB}{0,150,0}
+
+
+\usepackage{sectsty}
+\allsectionsfont{\raggedright}
+\end_preamble
+\options nofonts
 \use_default_options true
 \maintain_unincluded_children false
 \language english
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman WenQuanYi Micro Hei Mono
+\font_sans WenQuanYi Micro Hei Mono
+\font_typewriter WenQuanYi Micro Hei Mono
 \font_default_family default
-\use_non_tex_fonts false
+\use_non_tex_fonts true
 \font_sc false
 \font_osf false
 \font_sf_scale 100
 \font_tt_scale 100
+
 \graphics default
-\default_output_format default
+\default_output_format pdf4
 \output_sync 0
 \bibtex_command default
 \index_command default
 \paperfontsize default
-\use_hyperref false
+\spacing single
+\use_hyperref true
+\pdf_bookmarks true
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks true
+\pdf_pdfborder true
+\pdf_colorlinks true
+\pdf_backref section
+\pdf_pdfusetitle false
 \papersize default
 \use_geometry false
-\use_package amsmath 1
-\use_package amssymb 1
-\use_package cancel 1
-\use_package esint 1
-\use_package mathdots 1
-\use_package mathtools 1
-\use_package mhchem 1
-\use_package stackrel 1
-\use_package stmaryrd 1
-\use_package undertilde 1
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
 \cite_engine basic
-\cite_engine_type default
-\biblio_style plain
 \use_bibtopic false
 \use_indices false
 \paperorientation portrait
 \suppress_date false
-\justification true
 \use_refstyle 1
 \index Index
 \shortcut idx
@@ -269,11 +288,7 @@ Det(H)-k*Trace(H)<\epsilon
 \begin_layout Standard
 \begin_inset Formula 
 \begin{equation}
-\left[\begin{array}[t]{c}
--1\\
-0\\
-1
-\end{array}\right]
+\left[-1,0,1\right]^{T}
 \end{equation}
 
 \end_inset
@@ -413,11 +428,11 @@ b & c
 分别用算子：
 \begin_inset Formula 
 \begin{equation}
-\left[\begin{array}[t]{ccc}
+\begin{array}[t]{ccc}
 1 & 1 & 1\\
 1 & 1 & 1\\
 1 & 1 & 1
-\end{array}\right]
+\end{array}
 \end{equation}
 
 \end_inset
@@ -437,11 +452,16 @@ b & c
 源代码在
 \begin_inset CommandInset href
 LatexCommand href
+name "这里"
 target "https://github.com/xueyayang/v4l2_demo/tree/master/harris_corner/src"
 
 \end_inset
 
-。可以与OpenCV的实现达到同样的效果。
+。
+\end_layout
+
+\begin_layout Standard
+可以与OpenCV的实现达到同样的效果。
 \end_layout
 
 \begin_layout Section
