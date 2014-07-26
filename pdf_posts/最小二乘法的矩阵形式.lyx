@@ -97,7 +97,15 @@
 \end_layout
 
 \begin_layout Standard
-什么是最小二乘法？矩阵形式是什么样的？本文基于维基百科的Linear least squares (mathematics)词条写就。
+什么是最小二乘法？矩阵形式是什么样的？本文基于维基百科的
+\begin_inset CommandInset href
+LatexCommand href
+name "Linear least squares (mathematics)"
+target "http://en.wikipedia.org/wiki/Linear_least_squares_%28mathematics%29"
+
+\end_inset
+
+词条写就。
 \end_layout
 
 \begin_layout Section
