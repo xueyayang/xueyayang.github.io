@@ -1,0 +1,591 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass ctex-article
+\begin_preamble
+\let\oldquote\quote
+\renewcommand\quote{\small\oldquote}
+\let\oldquotation\quotation
+\renewcommand\quotation{\small\oldquotation}
+\usepackage{minted}
+\usepackage{color}
+\definecolor{mygrey}{gray}{0.88}
+\definecolor{keywords}{RGB}{255,0,90}
+\definecolor{comments}{RGB}{0,0,113}
+\definecolor{red}{RGB}{160,0,0}
+\definecolor{green}{RGB}{0,150,0}
+
+
+\usepackage{sectsty}
+\allsectionsfont{\raggedright}
+\end_preamble
+\options nofonts
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman WenQuanYi Micro Hei
+\font_sans WenQuanYi Micro Hei
+\font_typewriter WenQuanYi Micro Hei
+\font_default_family default
+\use_non_tex_fonts true
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format pdf4
+\output_sync 0
+\bibtex_command default
+\index_command default
+\float_placement !tbph
+\paperfontsize default
+\spacing single
+\use_hyperref true
+\pdf_bookmarks true
+\pdf_bookmarksnumbered true
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks true
+\pdf_pdfborder true
+\pdf_colorlinks true
+\pdf_backref page
+\pdf_pdfusetitle true
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+亚像素角点的求法
+\end_layout
+
+\begin_layout Section
+问题
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset href
+LatexCommand href
+name "求出角点"
+target "http://xueyayang.github.io/pdf_posts/Harris%E8%A7%92%E7%82%B9%E7%9A%84%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E9%AA%8C.pdf"
+
+\end_inset
+
+，下一步往往需要求亚像素点。即，从一个整数坐标，求出一个小数坐标。从科学上来讲，精度提高了。——“精确到了小数点后X位”。
+\end_layout
+
+\begin_layout Standard
+如何求？本文基于《Learning OpenCV》一书第十章“Subpixel Corner”一节写就。
+\end_layout
+
+\begin_layout Section
+解答
+\end_layout
+
+\begin_layout Subsection
+如何从整数算出小数？
+\end_layout
+
+\begin_layout Standard
+图像本来都是像素点，用整数来表达坐标最自然。为什么会有小数坐标呢？这其实是引入数学手段，进行计算的结果。那是什么数学方法呢？
+\begin_inset CommandInset href
+LatexCommand href
+name "最小二乘法"
+target "http://xueyayang.github.io/pdf_posts/%E6%9C%80%E5%B0%8F%E4%BA%8C%E4%B9%98%E6%B3%95%E7%9A%84%E7%9F%A9%E9%98%B5%E5%BD%A2%E5%BC%8F.pdf"
+
+\end_inset
+
+。
+\end_layout
+
+\begin_layout Subsection
+如何构造方程
+\end_layout
+
+\begin_layout Standard
+最小二乘法需要得到
+\begin_inset Formula $X\beta=y$
+\end_inset
+
+，才有方程可解。在亚像素角点的求解中，列方程用到了“垂直向量，乘积为0”这一性质。
+\end_layout
+
+\begin_layout Standard
+那是哪两个向量相乘呢？看图：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename image/cornersubpix.png
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+q，即待求的亚像素点，很神秘，未知。
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $p_{i}$
+\end_inset
+
+，即q周围的点，属于群众，坐标是已知的(自行选取)
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $(p_{i}-q)$
+\end_inset
+
+，即是第一个向量
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $p_{i}$
+\end_inset
+
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+处的灰度，
+\begin_inset Formula $G_{i}$
+\end_inset
+
+，即是第二个向量
+\end_layout
+
+\begin_layout Standard
+为什么
+\begin_inset Formula $G_{i}*(p_{i}-q)=0$
+\end_inset
+
+？考虑以下两种情况：
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $p_{0}$
+\end_inset
+
+这种情况，位于一块白色区域，此时，梯度为0
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $p_{1}$
+\end_inset
+
+这种情况，位于边缘，即黑白相交处，此时，梯度不为0，但是，与
+\begin_inset Formula $p_{1}-q$
+\end_inset
+
+相垂直！
+\end_layout
+
+\begin_layout Standard
+所以，无论哪种情况，都会导致：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+G_{i}*(p_{i}-q)=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+转换到最小二乘法的矩阵形式
+\end_layout
+
+\begin_layout Standard
+将上面的方程展开移项，得：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+G_{i}*q=G_{i}*p_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+最小二乘法求解:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+G_{i}^{T}G_{i}q=G_{i}^{T}G_{i}p_{i}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+即：
+\end_layout
+
+\begin_layout Standard
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+\begin_inset Formula 
+\begin{equation}
+q=(G_{i}^{T}G_{i})^{-1}*(G_{i}^{T}G_{i}p_{i})\label{eq:q}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+从理论到代码的对应
+\end_layout
+
+\begin_layout Standard
+理论是清晰的，我注重如何实现。源码在
+\begin_inset CommandInset href
+LatexCommand href
+name "这里"
+target "https://github.com/xueyayang/v4l2_demo/blob/master/harris_corner/src/find_subpixels.cpp"
+
+\end_inset
+
+，达到与OpenCV接口同样的效果。
+\end_layout
+
+\begin_layout Subsubsection
+如何选取
+\begin_inset Formula $p_{i}$
+\end_inset
+
+?
+\end_layout
+
+\begin_layout Standard
+初始的角点，整数坐标，设为
+\begin_inset Formula $q_{0}$
+\end_inset
+
+，以
+\begin_inset Formula $q_{0}$
+\end_inset
+
+为中心，选取一个窗口。尺寸可自选，如11，
+\begin_inset Formula $(5+1+5)*(5+1+5)$
+\end_inset
+
+。这个窗口中的每一点，构成了
+\begin_inset Formula $p_{i}$
+\end_inset
+
+。
+\end_layout
+
+\begin_layout Subsubsection
+如何计算梯度？
+\end_layout
+
+\begin_layout Standard
+求梯度在图像处理里，用Sobel算子做卷积即可。对于
+\begin_inset Formula $p_{i}$
+\end_inset
+
+点有：
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $G_{i}$
+\end_inset
+
+，对每个点处的梯度，
+\begin_inset Formula $\left[\begin{array}{cc}
+dx & dy\end{array}\right]$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $G_{i}^{T}$
+\end_inset
+
+，梯度的转置，
+\begin_inset Formula $\left[\begin{array}{c}
+dx\\
+dy
+\end{array}\right]$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $G_{i}^{T}*G_{i}$
+\end_inset
+
+，即
+\begin_inset Formula $\left[\begin{array}{cc}
+dxdx & dxdy\\
+dxdy & dydy
+\end{array}\right]$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+求和的处理
+\end_layout
+
+\begin_layout Standard
+q点只有一个，
+\begin_inset Formula $p_{i}$
+\end_inset
+
+点却有多个。所以，对于各点处的梯度，要求和。严格地来写，公式
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:q"
+
+\end_inset
+
+是不正确的，因为少了求和符号，加上后：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+q=\sum_{i=0}^{N}(G_{i}^{T}G_{i})^{-1}*(G_{i}^{T}G_{i}p_{i})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+权重的引入
+\end_layout
+
+\begin_layout Standard
+采用多点进行计算，本是为了更精确。但各点离中心距离不一，所以不可一视同仁，要引入权重，如高斯权重。假设
+\begin_inset Formula $p_{i}$
+\end_inset
+
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+处
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+权重为
+\begin_inset Formula $\omega_{i}$
+\end_inset
+
+，上式进一步修正为：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+q=\sum_{i=0}^{N}(G_{i}^{T}G_{i}\omega_{i})^{-1}*(G_{i}^{T}G_{i}\omega_{i}p_{i})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+迭代与终止条件？
+\end_layout
+
+\begin_layout Standard
+求解一次后，即可得到一个亚像素点
+\begin_inset Formula $q(q_{x},q_{y})$
+\end_inset
+
+。如果以
+\begin_inset Formula $q$
+\end_inset
+
+为中心点，再次：
+\end_layout
+
+\begin_layout Enumerate
+选取窗口，得到新的一组
+\begin_inset Formula $p_{i}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+对
+\begin_inset Formula $p_{i}$
+\end_inset
+
+求梯度
+\end_layout
+
+\begin_layout Enumerate
+用最小二乘法求解
+\end_layout
+
+\begin_layout Standard
+即得到新的点，
+\begin_inset Formula $q_{1}$
+\end_inset
+
+。
+\end_layout
+
+\begin_layout Standard
+如此多迭代几次，会得出一系列亚像素点
+\begin_inset Formula $q_{2},q_{3},\cdots,q_{n}$
+\end_inset
+
+。那什么时候终止呢？OpenCV中的做法是：
+\end_layout
+
+\begin_layout Itemize
+指定迭代次数，比如，迭代10次后，不再进行计算，认为得到最优解。
+\end_layout
+
+\begin_layout Itemize
+指定结果精度，比如，设定
+\begin_inset Formula $\epsilon=1.0e^{-6}$
+\end_inset
+
+，如果
+\begin_inset Formula $q_{n}-q_{n-1}<=\epsilon$
+\end_inset
+
+，即认为
+\begin_inset Formula $q_{n}$
+\end_inset
+
+是最优解。
+\end_layout
+
+\begin_layout Section
+总结
+\end_layout
+
+\begin_layout Itemize
+亚像素角点是纯数学方法计算出来的。
+\end_layout
+
+\begin_layout Itemize
+计算手段是用最小二乘法。
+\end_layout
+
+\begin_layout Itemize
+最小二乘法的计算过程，相当于选村长的过程：
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+从一点（原始角点）开始，选取周围有投票权的群众
+\end_layout
+
+\begin_layout Itemize
+群众的选取规则：离所有人的距离方差最小
+\end_layout
+
+\begin_layout Itemize
+选出的新村长（亚像素点）与在原村长周围，但不一样。
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+与OpenCV源码相比，文中简化了选取“群众”
+\begin_inset Formula $p_{i}$
+\end_inset
+
+的过程。没有用插值法。
+\end_layout
+
+\end_body
+\end_document
