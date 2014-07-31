@@ -488,7 +488,7 @@ P(x_{p})=\frac{1}{N}*\frac{1}{\sqrt{2\pi\sigma^{2}}}*\sum_{i=1}^{N}e^{-\frac{(x_
 \end_layout
 
 \begin_layout Standard
-脚注４中的实验之所以没有这一项，是因为所有的样本点都是有效的。
+脚注４中的实验之所以没有这一项，是因为所有的样本点都是有效的，并且对结果的影响大小是一样的，即权重都为1。
 \end_layout
 
 \begin_layout Standard
@@ -548,10 +548,44 @@ g(x)=-k^{\prime}(x)
 \end_layout
 
 \begin_layout Standard
-令上式等于０，解出:
+观察上式，理解上式的物理意义:
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $\nabla P(x_{p})$
+\end_inset
+
+是在点
+\begin_inset Formula $x_{p}$
+\end_inset
+
+处的导数，考虑离散形式，即是
+\series bold
+梯度
+\series default
+，是一个
+\series bold
+向量
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $x_{p}$
+\end_inset
+
+向量的起点；
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $x_{p}^{\prime}$
+\end_inset
+
+是向量的终点，可以写为：
+\end_layout
+
+\begin_layout Standard
 \begin_inset Formula 
 \begin{equation}
-{\color{red}x_{p}^{\prime}}=\frac{{\color{red}x_{i}}*g_{i}(\parallel\frac{(x_{p}-x_{i})^{2}}{h}\parallel)}{g_{i}(\parallel\frac{(x_{p}-x_{i})^{2}}{h}\parallel)}
+{\color{red}x_{p}^{\prime}}=\sum_{i=0}^{N}\frac{{\color{red}x_{i}}*g_{i}(\parallel\frac{(x_{p}-x_{i})^{2}}{h}\parallel)}{g_{i}(\parallel\frac{(x_{p}-x_{i})^{2}}{h}\parallel)}
 \end{equation}
 
 \end_inset
@@ -563,7 +597,11 @@ g(x)=-k^{\prime}(x)
 \begin_inset Formula $x_{p}^{\prime}$
 \end_inset
 
-就是新的中心位置。
+就是新的中心位置；
+\begin_inset Formula $x_{p}$
+\end_inset
+
+则是原来的中心位置。
 \end_layout
 
 \begin_layout Standard
@@ -579,7 +617,15 @@ g(x)=-k^{\prime}(x)
 \end_layout
 
 \begin_layout Standard
-观察公式发现，相对最简单的“质心”形式，选用高斯核，本质是将样本与原中心的
+观察公式发现，相对最简单的“质心”形式，选用高斯核，本质是将
+\begin_inset Formula $x_{i}$
+\end_inset
+
+(样本)与
+\begin_inset Formula $x_{p}$
+\end_inset
+
+(原中心)的
 \series bold
 距离
 \series default
@@ -587,15 +633,31 @@ g(x)=-k^{\prime}(x)
 \end_layout
 
 \begin_layout Standard
-对于高斯核来讲，这一因素表现为，距离越远，样本的发言权越小。
+对于高斯核来讲，这一因素表现为，
+\begin_inset Formula $x_{i}$
+\end_inset
+
+距离越远，在
+\begin_inset Formula $x_{p}$
+\end_inset
+
+(原中心)处的发言权越小。
 \end_layout
 
 \begin_layout Standard
-对于矩形核来讲，这一因素表现为，距离远近对发言权的大小无影响。
+对于矩形核来讲，这一因素表现为，
+\begin_inset Formula $x_{i}$
+\end_inset
+
+距离无论远近，在
+\begin_inset Formula $x_{p}$
+\end_inset
+
+(原中心)处的发言权都一样。
 \end_layout
 
 \begin_layout Standard
-回到实际情况，目标的颜色分布一般来讲，更接近矩形分布（颜色均匀）。并不随着距离而衰减，所以，对于胶水瓶盖子，高斯模型并无效果提升。
+回到实际情况，目标的颜色分布一般来讲，更接近矩形分布（颜色均匀）;并不随着距离而衰减。所以，对于胶水瓶盖子，高斯模型并无效果提升。
 \end_layout
 
 \begin_layout Subsection
