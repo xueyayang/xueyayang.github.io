@@ -11,7 +11,7 @@
   },
   {
     "url":"/pdf_posts/Mean-Shift算法原理及用于目标跟踪.pdf",
-    "date":"17 June 2014",
+    "date":"31 July 2014",
     "name":"Mean-Shift算法原理及用于目标跟踪.pdf"
   },
   {
@@ -38,5 +38,10 @@
     "url":"/pdf_posts/使用pdf.js在jekyll中嵌入PDF文件.pdf",
     "date":"23 May 2014",
     "name":"使用pdf.js在jekyll中嵌入PDF文件.pdf"
+  },
+  {
+    "url":"/pdf_posts/电子快门与曝光时间/电子快门与曝光时间.pdf",
+    "date":"26 August 2014",
+    "name":"电子快门与曝光时间.pdf"
   }
 ]

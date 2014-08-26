@@ -1,0 +1,278 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass ctex-article
+\begin_preamble
+\let\oldquote\quote
+\renewcommand\quote{\small\oldquote}
+\let\oldquotation\quotation
+\renewcommand\quotation{\small\oldquotation}
+\usepackage{minted}
+\usepackage{color}
+\definecolor{mygrey}{gray}{0.88}
+\definecolor{keywords}{RGB}{255,0,90}
+\definecolor{comments}{RGB}{0,0,113}
+\definecolor{red}{RGB}{160,0,0}
+\definecolor{green}{RGB}{0,150,0}
+
+
+\usepackage{sectsty}
+\allsectionsfont{\raggedright}
+\end_preamble
+\options nofonts
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman WenQuanYi Micro Hei
+\font_sans WenQuanYi Micro Hei
+\font_typewriter WenQuanYi Micro Hei
+\font_default_family default
+\use_non_tex_fonts true
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format pdf4
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref true
+\pdf_bookmarks true
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks false
+\pdf_pdfborder false
+\pdf_colorlinks false
+\pdf_backref false
+\pdf_pdfusetitle true
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+电子快门（Electric Shutter）曝光时间说明
+\end_layout
+
+\begin_layout Section
+电子快门是什么？
+\end_layout
+
+\begin_layout Standard
+机械快门可以理解为一道真的“门”，打开光线进来，关闭停止接受光线，“打开——关闭”就是曝光时间。电子快门没有物理上的门，
+\end_layout
+
+\begin_layout Quote
+而是利用了CCD感光系统不通电不工作的原理，在CCD不通电的情况下，尽管像场窗口仍然“大敞开”，但是并不能产生图像。如果在按下快门钮时，使用电子时间电路，使CC
+D只工作“一个指定的时间长短”，就也能获得像有快门“瞬间打开”一样的效果。——来自百度百科
+\end_layout
+
+\begin_layout Standard
+需要说明的是，上面提到的是CCD感光系统，查资料过程中发现Sensor有CCD与CMOS的区分。具体意味着什么不详，但不影响对电子快门曝光时间的理解。
+\end_layout
+
+\begin_layout Standard
+总结起来，机械与电子快门的曝光时间的定义：
+\end_layout
+
+\begin_layout Itemize
+机械快门曝光时间：【打开——接收光线——关闭】 之间的间隔。
+\end_layout
+
+\begin_layout Itemize
+电子快门曝光时间：【将像素清零——接收光线——读取该像素】 之间的间隔。
+\end_layout
+
+\begin_layout Section
+电子快门分两类：Rolling Shutter 与 Global Shutter 
+\end_layout
+
+\begin_layout Description
+Rolling Shutter，即卷帘快门。
+\end_layout
+
+\begin_layout Standard
+顾名思义，帘子通常是自上往下慢慢拉开的，所以曝光也是一行一行进行的。这种快门的特点是，捕捉到的一幅图像中，各部分不是同一刻的。为什么？假设拍一个人，从头部开始拉
+开帘子，即曝光第一行，是当前时刻
+\begin_inset Formula $T$
+\end_inset
+
+。帘子慢慢拉下，当完全拉开到脚部时，已经到了时刻
+\begin_inset Formula $T+\text{\Delta\_t}$
+\end_inset
+
+。用通常的1秒30帧的速度来考虑，头和脚的时间差距有33ms左右。
+\end_layout
+
+\begin_layout Standard
+这样拉帘子慢慢曝光并非有什么好处。而仅仅是因为电子器件本身的特性，即数据读出无法做到同时进行，而只能串行（一行一行依次来读）：
+\end_layout
+
+\begin_layout Quotation
+CMOS传感器的工作方式并不是像很多人想象的那样通过一个信号线就可以控制曝光的开始和结束。传感器的感光二极管不停的在捕获入射光子并转换成电子存储在电荷井中，控制
+部分可以将其读出和清零，但不能停止曝光。那么电子快门是怎么实现的呢？
+\end_layout
+
+\begin_layout Quotation
+对任一像素，在曝光开始时现将其清零，然后等待曝光时间过后，将信号值读出。因为数据的读出是串行的，所以清零/曝光/读出也只能逐行顺序进行，通常是从上至下。
+\end_layout
+
+\begin_layout Standard
+可以想象，这种快门拍摄高速运动的物体，会产生明显的变形。
+\end_layout
+
+\begin_layout Description
+Global Shutter，即全局快门。
+\end_layout
+
+\begin_layout Standard
+全局快门没有拉帘子的过程，而是走到帘子前一把扯掉，全部曝光，然后再同时停止曝光。这样就保证了一帧图像中，各部分内容发生于同一时刻。
+\end_layout
+
+\begin_layout Standard
+那如何解决串行读取数据的问题？解决的方法是，为每一个像素配一个存储单元。即，扯掉帘子——曝光——将像素搬到配套存储单元——读取。相当于在读取之前，找家“仓库”转
+存了一下。在进行下一帧曝光的时候，可以慢慢地去仓库搬。
+\end_layout
+
+\begin_layout Standard
+可以想像，这种方案成本比较贵。
+\end_layout
+
+\begin_layout Section
+Electrical Shutter Time 与 number of line
+\end_layout
+
+\begin_layout Standard
+手册里提到：
+\end_layout
+
+\begin_layout Quote
+\begin_inset Graphics
+	filename RollingShutter/electricShutter.PNG
+	scale 40
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+现在的问题是：
+\end_layout
+
+\begin_layout Itemize
+line是什么？从哪儿出来的？
+\end_layout
+
+\begin_layout Itemize
+number 是怎么计算的？
+\end_layout
+
+\begin_layout Standard
+首先说明，这两个问题只有在Rolling Shutter中才有，Global Shutter“咔嚓”一声就完了，没有line的问题，直接是全帧。
+\end_layout
+
+\begin_layout Standard
+在Rolling Shtter中，由于帘子是一行一行拉下来的（实际可能是一个像素点一个像素点，这里是方便说明），所以第一行接受到光线时，第二行还一片黑暗；第二行
+接受到光线时，第一行已经享受了一段时间，而第三行还是一片黑暗……画个简单的示意图（黑色表示未曝光，红色表示已曝光），：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename RollingShutter/ExposureTime.PNG
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+注意这是在同一帧图中，也就是拍一张图片的慢过程，而不是拍了好几张。曝光不是目的，我们最终要拿到数据。所以读数据的时机就很重要了。——我们可以在第二幅的时候，开始
+读第一行数据；也可以在第三幅的时候，再开始读第一行的数据；甚至再拖一拖，在第四幅的时候，才开始读第一行的数据……这样造成的区别就是：曝光的时间不一样。
+\end_layout
+
+\begin_layout Standard
+这样，就能给出Rolling Shutter的曝光时间的定义：
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+从重置一行，到读取该行数据，之间经过的时间。单位就是这段时间内，重置了的行数。
+\end_layout
+
+\begin_layout Standard
+根据这个概念，可以知道，一帧图片的曝光时间的范围是：单线（重置之后，下一行开始重置时就读）直到全帧时间（在顶部读出开始之前，已经重置到图像底部）。
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+这样就回答了开头的两个问题：
+\end_layout
+
+\begin_layout Itemize
+line指的是重置（或者读取）的行数
+\end_layout
+
+\begin_layout Itemize
+number of line是指重置——读取间隔内，经过的行数。
+\end_layout
+
+\begin_layout Section
+结论
+\end_layout
+
+\begin_layout Itemize
+ES time 可以设置范围为
+\begin_inset Formula $[1\text{，有效像素高度}]$
+\end_inset
+
+。根据手册，应该是1216。
+\end_layout
+
+\begin_layout Itemize
+这个值设的越大，曝光时间越长。
+\end_layout
+
+\begin_layout Itemize
+没有找到该数值与物理时间的对应关系，所以具体使用，还是要靠试。
+\end_layout
+
+\end_body
+\end_document
