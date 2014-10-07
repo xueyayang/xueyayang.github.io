@@ -112,13 +112,20 @@ grub2-install --recheck /dev/sda
 cat /boot/grub2/grub.cfg |grep Windows
 {% endhighlight %}
 输出：
-> menuentry "Windows 7 (loader) (on /dev/sda1)" --class windows --class os {
+> menuentry 'Windows Vista (loader) (on /dev/sda1)' --class windows --class os $menuentry_id_option 'osprober-chain-B070E02E70DFF954' {
 
 需要的是引号中的字符串。
 
 ###2.6.2  设置为默认
 {% highlight bash %}
-grub2-set-default "Windows 7 (loader) (on /dev/sda1)"
+#change the default
+grub2-set-default "Windows Vista (loader) (on /dev/sda1)"
+
+#check the default
+grub2-editenv list
+
+# re-generate grub.cfg
+gurb2-mkconfig -o /boot/grub2/grub.cfg
 {% endhighlight %}
 
 3 总结
