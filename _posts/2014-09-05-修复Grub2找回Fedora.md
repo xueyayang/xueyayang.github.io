@@ -125,7 +125,7 @@ grub2-set-default "Windows Vista (loader) (on /dev/sda1)"
 grub2-editenv list
 
 # re-generate grub.cfg
-gurb2-mkconfig -o /boot/grub2/grub.cfg
+grub2-mkconfig -o /boot/grub2/grub.cfg
 {% endhighlight %}
 
 3 总结
