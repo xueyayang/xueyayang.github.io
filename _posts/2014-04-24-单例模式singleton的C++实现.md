@@ -37,7 +37,7 @@ public:
 	static InitiationDispatcher* single_instance_;
 }
 
-//complete
+// implment
 InitiationDispatcher* InitiationDispatcher::instance()
 {
 	if(nullptr == single_instance_)
