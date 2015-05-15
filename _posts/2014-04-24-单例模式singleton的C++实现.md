@@ -55,6 +55,6 @@ InitiationDispatcher::~InitiationDispatcher()
 
 3 总结
 =====
-- 析构函数里，一定要对single_instance_置为nullptr。
+- 析构函数里，一定要对single\_instance\_置为nullptr。
 
 
