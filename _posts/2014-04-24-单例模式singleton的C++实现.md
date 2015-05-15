@@ -19,7 +19,7 @@ layout: default
 2.1 思路
 ----
 - 主要用到静态函数与静态方法。
-- 为了防止用户调用构造函数，new/声明，形成新的对象。需要将构造函数声明为protected的。
+- 为了防止用户调用构造函数，new声明，形成新的对象。需要将构造函数声明为protected的。
 
 2.2 代码
 ----
@@ -40,20 +40,21 @@ public:
 //complete
 InitiationDispatcher* InitiationDispatcher::instance()
 {
-	if(NULL != single_instance_)
+	if(nullptr == single_instance_)
 	{
-		return single_instance_;
+	    single_instance_ = new InitiationDispatcher();	
 	}
-	else
-	{
-		single_instance_ = new InitiationDispatcher();
-		return single_instance_;
-	}
+        return single_instance_;
+}
+
+InitiationDispatcher::~InitiationDispatcher()
+{
+    single_instance_ = nullptr; // 否则下次调用instance()时，可能会不new，直接返回野指针。
 }
 {% endhighlight %}
 
 3 总结
 =====
-- 不知道是因为平时对这个概念已经有了解还是怎样，觉得好简单的样子。
+- 析构函数里，一定要对single_instance_置为nullptr。
 
 
