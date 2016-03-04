@@ -1,30 +1,31 @@
 # User Settings | Edit there as per required
 
-title: accent
-url: "http://ankitsultana.me"
-baseurl: "/accent"
+title: Xueyayang
+url: "http://xueyayang.me"
+baseurl: "/xueyayang"
 
 # This will show up at the top of index page
 site_heading: >
-    foo <span class="faded">'s blog</span>
+    Xueyayang <span class="faded">'s blog</span>
 
-email: your@email.com
-author: yourname
+email: xueyayagn@email.com
+author: xueyayang
 # This description will show up in google search results
 # (for index page) etc.
 description: >
-    accent is, as Trump would put it, the best
+    #g is, as Trump would put it, the best
+    Hello!
 
 # This will what will show against &copy; in the footer
-copyright: accent
+copyright: Xueyy
 # Toggle your short bio, which will displayed on your index page
 # Just toggle it and run jekyll again to see
 intro: false         # Tip: Remove the span from site_heading if intro is set to true
 # This will be displayed in your intro
 short_bio: >
-    Welcome! This is <span>accent</span>, a mobile friendly theme for Jekyll. The main feature of this
-    theme is that you can change the accent color. Refer the
-    <a class="underline different-highlight" href="http://ankitsultana.me/accent/documentation.html">
+    Welcome! This is <span>g</span>, a mobile friendly theme for Jekyll. The main feature of this
+    theme is that you can change the g color. Refer the
+    <a class="underline different-highlight" href="http://ankitsultana.me/g/documentation.html">
         Documentation
     </a>
     to know how.
@@ -41,7 +42,7 @@ comments: true
 about_stub: >
     Keep this sentence less than 13 words or it won't look good.
 
-about_footer: true
+about_footer: false
 
 twitter_username: AnkitSultana
 github_username: yourgithub
@@ -56,8 +57,8 @@ paginate_path: "/page/:num"
 tracking_id: UA-69243698-7 # GA Tracking ID
 
 # Social Stuff | open graph and twitter cards
-og_image: "images/accent.png" # This will show in facebook thumbnails
-twitter_image: "http://ankitsultana.me/images/accent.png?1234" # This will show in twitter cards
+og_image: "images/g.png" # This will show in facebook thumbnails
+twitter_image: "http://ankitsultana.me/images/g.png?1234" # This will show in twitter cards
 
 ####################################
 ####################################
