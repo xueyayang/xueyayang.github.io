@@ -79,15 +79,16 @@ color: #aaa;
 /*****************************************************************************/
 
 .site {
-	font-size: 110%;
+	font-size: 120%;
 	text-align: justify;
-width: 42em;
+width: 52em;
 margin: 3em auto 2em auto;
 		line-height: 1.5em;
 }
 
 .title {
 color: #a00;
+	   font-size: 200%
 	   font-weight: bold;
 	   margin-bottom: 2em;
 }
